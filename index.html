@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mae</title>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F7F4F0;
+      --bg2: #EDE9E3;
+      --bg3: #E5E0D8;
+      --text: #1A1714;
+      --muted: #8C8378;
+      --accent: #C4836A;
+      --border: #DDD8D0;
+      --mono: 'Geist Mono', monospace;
+      --sans: 'Inter', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-weight: 300;
+      line-height: 1.6;
+      font-size: 15px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 4rem;
+      background: rgba(247,244,240,0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .nav-logo:hover { color: var(--text); }
+
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.01em;
+      transition: color 0.15s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    main { max-width: 680px; margin: 0 auto; padding: 7.5rem 2rem 6rem; }
+
+    section { padding: 4rem 0; border-top: 1px solid var(--border); }
+    section.bio { border-top: none; padding-top: 0; }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 1.75rem;
+    }
+
+    /* BIO */
+    .bio-name {
+      font-size: 1.1rem;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.85rem;
+      color: var(--text);
+    }
+
+    .bio-text {
+      font-size: 0.9rem;
+      color: var(--muted);
+      max-width: 500px;
+      line-height: 1.85;
+      margin-bottom: 1.4rem;
+    }
+
+    .bio-links { display: flex; align-items: center; gap: 1rem; }
+
+    .bio-links a {
+      color: var(--muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      transition: color 0.15s;
+    }
+    .bio-links a:hover { color: var(--accent); }
+
+    .bio-resume {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1px;
+      margin-left: 0.5rem;
+      transition: color 0.15s, border-color 0.15s;
+      display: inline !important;
+    }
+    .bio-resume:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* NOW */
+    .now-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 2rem;
+      padding: 0.9rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .now-item:first-child { border-top: 1px solid var(--border); }
+
+    .now-item-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      min-width: 100px;
+      flex-shrink: 0;
+      padding-top: 0.15rem;
+    }
+
+    .now-item-content { display: flex; flex-direction: column; gap: 0.45rem; }
+    .now-item-content p { font-size: 0.85rem; color: var(--muted); line-height: 1.65; }
+
+    /* WEATHER */
+    .weather-widget {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.28rem 0.65rem;
+      width: fit-content;
+    }
+
+    .weather-temp { color: var(--text); font-weight: 400; }
+    .weather-sep { color: var(--border); }
+    .weather-loading { opacity: 0.5; }
+
+    /* WRITING */
+    .post-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 0.9rem 0;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      transition: opacity 0.15s;
+      gap: 1rem;
+    }
+    .post-item:first-child { border-top: 1px solid var(--border); }
+    .post-item:hover { opacity: 0.5; }
+    .post-title { font-size: 0.88rem; color: var(--text); font-weight: 300; }
+    .post-date { font-family: var(--mono); font-size: 0.67rem; color: var(--muted); white-space: nowrap; }
+
+    /* MAP */
+    .map-wrap {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      height: 380px;
+      background: var(--bg2);
+      position: relative;
+    }
+
+    .map-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
+
+    .map-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+    .map-placeholder svg { opacity: 0.2; }
+    .map-placeholder span {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    .map-dot {
+      position: absolute;
+      width: 7px; height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+      opacity: 0.6;
+    }
+    .map-dot::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      border: 1px solid var(--accent);
+      opacity: 0.35;
+    }
+
+    .country-tags { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 1.25rem; }
+    .tag {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      background: var(--bg3);
+      color: var(--muted);
+      padding: 0.2rem 0.6rem;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      letter-spacing: 0.03em;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 0.67rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a { color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .footer-links a:hover { color: var(--text); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .bio > * { animation: fadeUp 0.5s ease both; }
+    .bio > *:nth-child(1) { animation-delay: 0.05s; }
+    .bio > *:nth-child(2) { animation-delay: 0.12s; }
+    .bio > *:nth-child(3) { animation-delay: 0.2s; }
+
+    @media (max-width: 600px) {
+      nav { padding: 1.1rem 1.5rem; }
+      main { padding: 6.5rem 1.5rem 4rem; }
+      .nav-links { gap: 1.25rem; }
+      .map-wrap { height: 260px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">mae.xyz</a>
+  <ul class="nav-links">
+    <li><a href="#now">now</a></li>
+    <li><a href="#writing">writing</a></li>
+    <li><a href="#travel">travel</a></li>
+  </ul>
+</nav>
+
+<main>
+
+  <!-- BIO -->
+  <section class="bio">
+    <p class="bio-name">Hi! I'm Mae 👋</p>
+    <p class="bio-text">
+      Chief of Staff at Outset Capital. I build operational infrastructure for early-stage funds — CRM systems, automations, LP relations, fund administration. Chemical engineer by training, operator by trade. Between the U.S. and Southeast Asia. I track aircraft types, review every restaurant I visit, and plan trips with a level of detail that surprises people.
+    </p>
+    <div class="bio-links">
+      <a href="#" title="LinkedIn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+      </a>
+      <a href="#" title="GitHub">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+      </a>
+      <a href="mailto:hello@mae.xyz" title="Email">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+      </a>
+      <a href="#" title="Instagram">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+      </a>
+      <a href="#" class="bio-resume">resume ↗</a>
+    </div>
+  </section>
+
+  <!-- NOW -->
+  <section id="now">
+    <p class="section-label">Now</p>
+
+    <div class="now-item">
+      <span class="now-item-label">working on</span>
+      <div class="now-item-content">
+        <p>CRM and automation infrastructure at Outset Capital.</p>
+      </div>
+    </div>
+
+    <div class="now-item">
+      <span class="now-item-label">currently in</span>
+      <div class="now-item-content">
+        <p>Philippines — visiting family.</p>
+        <div class="weather-widget" id="weather">
+          <span class="weather-loading">fetching weather...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="now-item">
+      <span class="now-item-label">next trip</span>
+      <div class="now-item-content">
+        <p>Singapore.</p>
+      </div>
+    </div>
+
+    <div class="now-item">
+      <span class="now-item-label">reading</span>
+      <div class="now-item-content">
+        <p>Operational frameworks for small teams.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WRITING -->
+  <section id="writing">
+    <p class="section-label">Writing</p>
+    <a class="post-item" href="#">
+      <span class="post-title">On building fund operations from scratch</span>
+      <span class="post-date">Feb 2025</span>
+    </a>
+    <a class="post-item" href="#">
+      <span class="post-title">Attio vs every CRM I've tried</span>
+      <span class="post-date">Jan 2025</span>
+    </a>
+    <a class="post-item" href="#">
+      <span class="post-title">How I plan a trip (yes, there's a spreadsheet)</span>
+      <span class="post-date">Dec 2024</span>
+    </a>
+    <a class="post-item" href="#">
+      <span class="post-title">What chemical engineering taught me about ops</span>
+      <span class="post-date">Sep 2024</span>
+    </a>
+  </section>
+
+  <!-- TRAVEL + MAP -->
+  <section id="travel">
+    <p class="section-label">Travel</p>
+    <div class="map-wrap">
+      <!--
+        TO CONNECT YOUR GOOGLE MAPS REVIEWS:
+        Replace the placeholder div below with:
+        <iframe src="https://www.google.com/maps/d/embed?mid=YOUR_MAP_ID" allowfullscreen></iframe>
+      -->
+      <div class="map-placeholder">
+        <div class="map-dot" style="top:38%;left:72%"></div>
+        <div class="map-dot" style="top:44%;left:78%"></div>
+        <div class="map-dot" style="top:52%;left:80%"></div>
+        <div class="map-dot" style="top:35%;left:14%"></div>
+        <div class="map-dot" style="top:41%;left:48%"></div>
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span>google maps embed goes here</span>
+      </div>
+    </div>
+    <div class="country-tags">
+      <span class="tag">🇵🇭 Philippines</span>
+      <span class="tag">🇸🇬 Singapore</span>
+      <span class="tag">🇯🇵 Japan</span>
+      <span class="tag">🇰🇷 South Korea</span>
+      <span class="tag">🇹🇭 Thailand</span>
+      <span class="tag">🇺🇸 United States</span>
+    </div>
+  </section>
+
+  <footer>
+    <span>mae.xyz</span>
+    <div class="footer-links">
+      <a href="#">linkedin</a>
+      <a href="#">github</a>
+      <a href="#">email</a>
+    </div>
+  </footer>
+
+</main>
+
+<script>
+  // ─────────────────────────────────────────────
+  // WEATHER WIDGET — OpenWeatherMap
+  // 1. Sign up free at openweathermap.org/api
+  // 2. Replace 'YOUR_API_KEY' with your key
+  // ─────────────────────────────────────────────
+  const WEATHER_API_KEY = 'YOUR_API_KEY';
+  const WEATHER_CITY    = 'Manila';
+  const WEATHER_UNITS   = 'metric'; // change to 'imperial' for °F
+
+  const weatherIcons = {
+    '01d':'☀️','01n':'🌙',
+    '02d':'⛅','02n':'⛅',
+    '03d':'☁️','03n':'☁️',
+    '04d':'☁️','04n':'☁️',
+    '09d':'🌧️','09n':'🌧️',
+    '10d':'🌦️','10n':'🌦️',
+    '11d':'⛈️','11n':'⛈️',
+    '13d':'❄️','13n':'❄️',
+    '50d':'🌫️','50n':'🌫️',
+  };
+
+  async function fetchWeather() {
+    const el = document.getElementById('weather');
+
+    // Demo mode — shows realistic placeholder until you add your API key
+    if (WEATHER_API_KEY === 'YOUR_API_KEY') {
+      el.innerHTML = `
+        <span>🌤️</span>
+        <span class="weather-temp">32°C</span>
+        <span class="weather-sep">·</span>
+        <span>partly cloudy · Manila</span>
+      `;
+      return;
+    }
+
+    try {
+      const res  = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${WEATHER_CITY}&appid=${WEATHER_API_KEY}&units=${WEATHER_UNITS}`);
+      const data = await res.json();
+      const icon = weatherIcons[data.weather[0].icon] || '🌡️';
+      const temp = Math.round(data.main.temp);
+      const unit = WEATHER_UNITS === 'metric' ? '°C' : '°F';
+      const desc = data.weather[0].description;
+
+      el.innerHTML = `
+        <span>${icon}</span>
+        <span class="weather-temp">${temp}${unit}</span>
+        <span class="weather-sep">·</span>
+        <span>${desc} · ${WEATHER_CITY}</span>
+      `;
+    } catch {
+      el.innerHTML = `<span class="weather-loading">weather unavailable</span>`;
+    }
+  }
+
+  fetchWeather();
+</script>
+
+</body>
+</html>
