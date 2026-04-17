@@ -245,9 +245,9 @@
 
   <!-- BIO -->
   <section class="bio">
-    <p class="bio-name">Hi, I'm Mae 👋</p>
+    <p class="bio-name">Hi, I'm Christine Mae 👋</p>
     <p class="bio-text">
-      Chief of Staff at Outset Capital, where I run fund operations solo for a 45-company portfolio — capital deployment, CRM, LP relations, and whatever else needs doing. Chemical engineer by training (UPLB, cum laude, age 19). I build internal tools with Claude Code, track aircraft types, review every restaurant I visit, and plan trips with spreadsheets that would concern most people.
+      Chief of Staff at Outset Capital, where I built fund operations from scratch — solo — for a 45-company portfolio. I own capital deployment, CRM, LP relations, deal flow screening, and event production (Thursday Nights in AI: 300+ applicants per event). Chemical engineer by training, UPLB cum laude at 19. I'm AI-native and build internal tools with Claude Code. Outside work: I track aircraft types, review every restaurant I visit, and plan trips with spreadsheets that would concern most people.
     </p>
     <div class="bio-links">
       <a href="https://www.linkedin.com/in/cmbberbon/" title="LinkedIn" target="_blank" rel="noopener">
@@ -258,6 +258,9 @@
       </a>
       <a href="mailto:christinetse7@gmail.com" title="Email">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+      </a>
+      <a href="https://www.instagram.com/potatoesandflowers/" title="Instagram" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
       </a>
       <a href="./Christine_Tse_Resume.pdf" class="bio-resume" target="_blank" rel="noopener">resume ↗</a>
     </div>
@@ -277,7 +280,7 @@
     <div class="now-item">
       <span class="now-item-label">currently in</span>
       <div class="now-item-content">
-        <p>Philippines — visiting family.</p>
+        <p>Chicago, IL.</p>
         <div class="weather-widget" id="weather">
           <span class="weather-loading">fetching weather...</span>
         </div>
@@ -361,60 +364,23 @@
 </main>
 
 <script>
-  // ─────────────────────────────────────────────
-  // WEATHER WIDGET — OpenWeatherMap
-  // 1. Sign up free at openweathermap.org/api
-  // 2. Replace 'YOUR_API_KEY' with your key
-  // ─────────────────────────────────────────────
-  const WEATHER_API_KEY = 'YOUR_API_KEY';
-  const WEATHER_CITY    = 'Manila';
-  const WEATHER_UNITS   = 'metric'; // change to 'imperial' for °F
-
-  const weatherIcons = {
-    '01d':'☀️','01n':'🌙',
-    '02d':'⛅','02n':'⛅',
-    '03d':'☁️','03n':'☁️',
-    '04d':'☁️','04n':'☁️',
-    '09d':'🌧️','09n':'🌧️',
-    '10d':'🌦️','10n':'🌦️',
-    '11d':'⛈️','11n':'⛈️',
-    '13d':'❄️','13n':'❄️',
-    '50d':'🌫️','50n':'🌫️',
-  };
-
   async function fetchWeather() {
     const el = document.getElementById('weather');
-
-    // Demo mode — shows realistic placeholder until you add your API key
-    if (WEATHER_API_KEY === 'YOUR_API_KEY') {
-      el.innerHTML = `
-        <span>🌤️</span>
-        <span class="weather-temp">32°C</span>
-        <span class="weather-sep">·</span>
-        <span>partly cloudy · Manila</span>
-      `;
-      return;
-    }
-
     try {
-      const res  = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${WEATHER_CITY}&appid=${WEATHER_API_KEY}&units=${WEATHER_UNITS}`);
+      const res  = await fetch('https://wttr.in/Chicago?format=j1');
       const data = await res.json();
-      const icon = weatherIcons[data.weather[0].icon] || '🌡️';
-      const temp = Math.round(data.main.temp);
-      const unit = WEATHER_UNITS === 'metric' ? '°C' : '°F';
-      const desc = data.weather[0].description;
-
+      const cur  = data.current_condition[0];
+      const temp = cur.temp_F;
+      const desc = cur.weatherDesc[0].value;
       el.innerHTML = `
-        <span>${icon}</span>
-        <span class="weather-temp">${temp}${unit}</span>
+        <span class="weather-temp">${temp}°F</span>
         <span class="weather-sep">·</span>
-        <span>${desc} · ${WEATHER_CITY}</span>
+        <span>${desc} · Chicago</span>
       `;
     } catch {
       el.innerHTML = `<span class="weather-loading">weather unavailable</span>`;
     }
   }
-
   fetchWeather();
 </script>
 
