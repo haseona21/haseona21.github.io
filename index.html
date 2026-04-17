@@ -442,8 +442,9 @@
 
 <script>
   // ── REVIEWS MAP ──
-  const map = L.map('leaflet-map', { zoomControl: false, scrollWheelZoom: false, minZoom: 1 });
-  map.fitWorld();
+  const map = L.map('leaflet-map', { zoomControl: false, scrollWheelZoom: false, minZoom: 1, worldCopyJump: false });
+  map.setView([20, 0], 1);
+  setTimeout(() => map.invalidateSize(), 100);
 
   // Labels-only tile layer rendered above everything
   map.createPane('labels');
