@@ -27,6 +27,9 @@
   }
   </script>
   <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/topojson-client@3/dist/topojson-client.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -203,41 +206,6 @@
 
     .map-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
 
-    .map-placeholder {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.75rem;
-    }
-    .map-placeholder svg { opacity: 0.2; }
-    .map-placeholder span {
-      font-family: var(--mono);
-      font-size: 0.68rem;
-      color: var(--muted);
-      letter-spacing: 0.08em;
-    }
-
-    .map-dot {
-      position: absolute;
-      width: 7px; height: 7px;
-      background: var(--accent);
-      border-radius: 50%;
-      opacity: 0.6;
-    }
-    .map-dot::after {
-      content: '';
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%,-50%);
-      width: 16px; height: 16px;
-      border-radius: 50%;
-      border: 1px solid var(--accent);
-      opacity: 0.35;
-    }
-
     .country-tags { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 1.25rem; }
     .tag {
       font-family: var(--mono);
@@ -367,20 +335,7 @@
   <section id="travel">
     <p class="section-label">Travel</p>
     <div class="map-wrap">
-      <!--
-        TO CONNECT YOUR GOOGLE MAPS REVIEWS:
-        Replace the placeholder div below with:
-        <iframe src="https://www.google.com/maps/d/embed?mid=YOUR_MAP_ID" allowfullscreen></iframe>
-      -->
-      <div class="map-placeholder">
-        <div class="map-dot" style="top:38%;left:72%"></div>
-        <div class="map-dot" style="top:44%;left:78%"></div>
-        <div class="map-dot" style="top:52%;left:80%"></div>
-        <div class="map-dot" style="top:35%;left:14%"></div>
-        <div class="map-dot" style="top:41%;left:48%"></div>
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-        <span>google maps embed goes here</span>
-      </div>
+      <div id="leaflet-map" style="width:100%;height:100%;"></div>
     </div>
     <div class="country-tags">
       <span class="tag">🇵🇭 Philippines</span>
@@ -404,6 +359,53 @@
 </main>
 
 <script>
+  // ── REVIEWS MAP ──
+  const map = L.map('leaflet-map', { zoomControl: false, scrollWheelZoom: false })
+    .setView([20, 20], 2);
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap © CARTO',
+    maxZoom: 19
+  }).addTo(map);
+
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+  // Visited country IDs (ISO 3166-1 numeric)
+  // Philippines=608, Singapore=702, Japan=392, UAE=784, HK=344, US=840, Canada=124
+  const VISITED = new Set([608, 702, 392, 784, 344, 840, 124]);
+
+  fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+    .then(r => r.json())
+    .then(topo => {
+      const countries = topojson.feature(topo, topo.objects.countries);
+      L.geoJSON(countries, {
+        style: f => VISITED.has(+f.id)
+          ? { fillColor: '#C4836A', fillOpacity: 0.2, weight: 0.5, color: '#C4836A', opacity: 0.3 }
+          : { fillColor: 'transparent', fillOpacity: 0, weight: 0 },
+        interactive: false
+      }).addTo(map);
+    });
+
+  const dot = L.divIcon({
+    className: '',
+    html: '<div style="width:8px;height:8px;background:#C4836A;border-radius:50%;border:1.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,0.25)"></div>',
+    iconSize: [8, 8],
+    iconAnchor: [4, 4]
+  });
+
+  fetch('./reviews.json')
+    .then(r => r.json())
+    .then(data => {
+      data.features.forEach(f => {
+        const [lng, lat] = f.geometry.coordinates;
+        const { name, address, rating, url } = f.properties;
+        const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+        L.marker([lat, lng], { icon: dot })
+          .bindPopup(`<strong>${name}</strong><br><span style="color:#C4836A">${stars}</span><br><small>${address}</small><br><a href="${url}" target="_blank" rel="noopener" style="font-size:0.75rem">view on maps ↗</a>`)
+          .addTo(map);
+      });
+    });
+
   async function fetchWeather() {
     const el = document.getElementById('weather');
     try {
