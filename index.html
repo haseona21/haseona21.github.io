@@ -223,6 +223,23 @@
     .map-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
     #leaflet-map { background: #FAF8F5; }
 
+    /* PROJECTS */
+    .project-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 0.9rem 0;
+      border-bottom: 1px solid var(--border);
+      gap: 1rem;
+    }
+    .project-item:first-child { border-top: 1px solid var(--border); }
+    .project-info { display: flex; flex-direction: column; gap: 0.3rem; }
+    .project-name { font-size: 0.88rem; color: var(--text); font-weight: 300; }
+    .project-name a { color: inherit; text-decoration: none; }
+    .project-name a:hover { color: var(--accent); }
+    .project-desc { font-size: 0.78rem; color: var(--muted); }
+    .project-lang { font-family: var(--mono); font-size: 0.65rem; color: var(--muted); white-space: nowrap; }
+
     .map-note {
       font-family: var(--mono);
       font-size: 0.62rem;
@@ -356,6 +373,12 @@
     <p class="map-note">* places I've reviewed on Google Maps</p>
   </section>
 
+  <!-- PROJECTS -->
+  <section id="projects">
+    <p class="section-label">Projects</p>
+    <div id="projects-list"></div>
+  </section>
+
   <footer>
     <span>mae.xyz</span>
     <div class="footer-links">
@@ -417,6 +440,28 @@
         L.marker([lat, lng], { icon: dot })
           .bindPopup(`<strong>${name}</strong>${stars ? `<br><span style="color:#C4836A">${stars}</span>` : ''}<br><small>${address}</small>${mapsLink}`)
           .addTo(map);
+      });
+    });
+
+  // ── GITHUB PROJECTS ──
+  fetch('https://api.github.com/users/haseona21/repos?sort=updated&per_page=20')
+    .then(r => r.json())
+    .then(repos => {
+      const list = document.getElementById('projects-list');
+      const filtered = repos.filter(r => !r.fork && r.name !== 'haseona21.github.io');
+      if (!filtered.length) {
+        list.innerHTML = '<p class="project-desc" style="padding:0.9rem 0">More coming soon.</p>';
+        return;
+      }
+      filtered.forEach(r => {
+        list.innerHTML += `
+          <div class="project-item">
+            <div class="project-info">
+              <span class="project-name"><a href="${r.html_url}" target="_blank" rel="noopener">${r.name.replace(/-/g,' ')}</a></span>
+              ${r.description ? `<span class="project-desc">${r.description}</span>` : ''}
+            </div>
+            ${r.language ? `<span class="project-lang">${r.language}</span>` : ''}
+          </div>`;
       });
     });
 
