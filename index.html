@@ -442,11 +442,19 @@
 
 <script>
   // ── REVIEWS MAP ──
-  const map = L.map('leaflet-map', { zoomControl: false, scrollWheelZoom: false, minZoom: 1, maxZoom: 8, worldCopyJump: false });
-  map.fitBounds([[-60, -170], [75, 170]]);
+  const WORLD_BOUNDS = L.latLngBounds([[-60, -180], [82, 180]]);
+  const map = L.map('leaflet-map', {
+    zoomControl: false,
+    scrollWheelZoom: false,
+    minZoom: 1,
+    maxZoom: 8,
+    worldCopyJump: false,
+    maxBounds: WORLD_BOUNDS
+  });
+  map.fitBounds(WORLD_BOUNDS, { animate: false });
   setTimeout(() => map.invalidateSize(), 50);
-  setTimeout(() => { map.invalidateSize(); map.fitBounds([[-60, -170], [75, 170]]); }, 300);
-  window.addEventListener('load', () => { map.invalidateSize(); map.fitBounds([[-60, -170], [75, 170]]); });
+  setTimeout(() => { map.invalidateSize(); map.fitBounds(WORLD_BOUNDS, { animate: false }); }, 300);
+  window.addEventListener('load', () => { map.invalidateSize(); map.fitBounds(WORLD_BOUNDS, { animate: false }); });
 
   // Labels-only tile layer rendered above everything
   map.createPane('labels');
@@ -455,6 +463,7 @@
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
     attribution: '© OpenStreetMap © CARTO',
     maxZoom: 19,
+    noWrap: true,
     pane: 'labels'
   }).addTo(map);
 
