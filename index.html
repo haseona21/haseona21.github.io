@@ -56,8 +56,8 @@
 
     main { max-width: 680px; margin: 0 auto; padding: 5rem 2rem 6rem; }
 
-    section { padding: 4rem 0; border-top: 1px solid var(--border); }
-    section.bio { border-top: none; padding-top: 0; }
+    section { padding: 4rem 0; }
+    section.bio { padding-top: 0; }
 
     .section-label {
       font-family: var(--mono);
@@ -150,6 +150,8 @@
 
     .now-item-content { display: flex; flex-direction: column; gap: 0.45rem; }
     .now-item-content p { font-size: 0.85rem; color: var(--muted); line-height: 1.65; }
+    .now-item-content a { color: var(--muted); text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 3px; transition: color 0.15s, text-decoration-color 0.15s; }
+    .now-item-content a:hover { color: var(--accent); text-decoration-color: var(--accent); }
 
     /* WEATHER */
     .weather-widget {
@@ -187,6 +189,7 @@
     .post-item:hover { opacity: 0.5; }
     .post-title { font-size: 0.88rem; color: var(--text); font-weight: 300; }
     .post-date { font-family: var(--mono); font-size: 0.67rem; color: var(--muted); white-space: nowrap; }
+    .writing-empty { font-size: 0.85rem; color: var(--muted); }
 
     /* MAP */
     .map-wrap {
@@ -335,14 +338,21 @@
     <div class="now-item">
       <span class="now-item-label">next trip</span>
       <div class="now-item-content">
-        <p>Singapore.</p>
+        <p>London.</p>
       </div>
     </div>
 
     <div class="now-item">
       <span class="now-item-label">reading</span>
       <div class="now-item-content">
-        <p>Operational frameworks for small teams.</p>
+        <p><a href="https://www.amazon.com/Sunrise-Reaping-Hunger-Games-Novel/dp/1546171460" target="_blank" rel="noopener">Sunrise on the Reaping</a>.</p>
+      </div>
+    </div>
+
+    <div class="now-item">
+      <span class="now-item-label">playing</span>
+      <div class="now-item-content">
+        <p><a href="https://www.alanwake.com/" target="_blank" rel="noopener">Alan Wake II</a>.</p>
       </div>
     </div>
   </section>
@@ -350,22 +360,7 @@
   <!-- WRITING -->
   <section id="writing">
     <p class="section-label">Writing</p>
-    <a class="post-item" href="#">
-      <span class="post-title">On building fund operations from scratch</span>
-      <span class="post-date">Feb 2025</span>
-    </a>
-    <a class="post-item" href="#">
-      <span class="post-title">Attio vs every CRM I've tried</span>
-      <span class="post-date">Jan 2025</span>
-    </a>
-    <a class="post-item" href="#">
-      <span class="post-title">How I plan a trip (yes, there's a spreadsheet)</span>
-      <span class="post-date">Dec 2024</span>
-    </a>
-    <a class="post-item" href="#">
-      <span class="post-title">What chemical engineering taught me about ops</span>
-      <span class="post-date">Sep 2024</span>
-    </a>
+    <p class="writing-empty">Still cooking. 🍳</p>
   </section>
 
   <!-- TRAVEL + MAP -->
