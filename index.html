@@ -442,19 +442,19 @@
 
 <script>
   // ── REVIEWS MAP ──
-  const WORLD_BOUNDS = L.latLngBounds([[-60, -180], [82, 180]]);
+  const WORLD_BOUNDS = [[-60, -180], [82, 180]];
   const map = L.map('leaflet-map', {
     zoomControl: false,
     scrollWheelZoom: false,
     minZoom: 1,
     maxZoom: 8,
     worldCopyJump: false,
-    maxBounds: WORLD_BOUNDS
   });
   map.fitBounds(WORLD_BOUNDS, { animate: false });
-  setTimeout(() => map.invalidateSize(), 50);
-  setTimeout(() => { map.invalidateSize(); map.fitBounds(WORLD_BOUNDS, { animate: false }); }, 300);
-  window.addEventListener('load', () => { map.invalidateSize(); map.fitBounds(WORLD_BOUNDS, { animate: false }); });
+
+  function fitMap() { map.invalidateSize(); map.fitBounds(WORLD_BOUNDS, { animate: false }); }
+  new ResizeObserver(fitMap).observe(document.getElementById('leaflet-map').parentElement);
+  window.addEventListener('load', fitMap);
 
   // Labels-only tile layer rendered above everything
   map.createPane('labels');
