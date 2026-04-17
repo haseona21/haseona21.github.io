@@ -221,6 +221,7 @@
     }
 
     .map-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
+    #leaflet-map { background: #FAF8F5; }
 
     .map-note {
       font-family: var(--mono);
@@ -371,14 +372,18 @@
   const map = L.map('leaflet-map', { zoomControl: false, scrollWheelZoom: false })
     .setView([20, 20], 2);
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  // Labels-only tile layer rendered above everything
+  map.createPane('labels');
+  map.getPane('labels').style.zIndex = 650;
+  map.getPane('labels').style.pointerEvents = 'none';
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
     attribution: '© OpenStreetMap © CARTO',
-    maxZoom: 19
+    maxZoom: 19,
+    pane: 'labels'
   }).addTo(map);
 
   L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-  // Visited country IDs (ISO 3166-1 numeric)
   // Philippines=608, Singapore=702, Japan=392, UAE=784, HK=344, US=840, Canada=124
   const VISITED = new Set([608, 702, 392, 784, 344, 840, 124]);
 
@@ -388,8 +393,8 @@
       const countries = topojson.feature(topo, topo.objects.countries);
       L.geoJSON(countries, {
         style: f => VISITED.has(+f.id)
-          ? { fillColor: '#C4836A', fillOpacity: 0.2, weight: 0.5, color: '#C4836A', opacity: 0.3 }
-          : { fillColor: 'transparent', fillOpacity: 0, weight: 0 },
+          ? { fillColor: '#C4A090', fillOpacity: 1, weight: 0.5, color: '#B89080', opacity: 0.4 }
+          : { fillColor: '#E0D9D0', fillOpacity: 1, weight: 0.3, color: '#CEC7BE', opacity: 0.5 },
         interactive: false
       }).addTo(map);
     });
