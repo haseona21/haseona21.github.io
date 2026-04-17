@@ -3,7 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mae</title>
+  <title>Christine Mae Tse</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg"/>
+  <meta name="description" content="Christine Mae Tse — Chief of Staff at Outset Capital. Fund operations, event production, and deal flow. Based in Chicago."/>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Christine Mae Tse",
+    "alternateName": "Mae Tse",
+    "jobTitle": "Chief of Staff",
+    "worksFor": {
+      "@type": "Organization",
+      "name": "Outset Capital"
+    },
+    "url": "https://haseona21.github.io",
+    "sameAs": [
+      "https://www.linkedin.com/in/cmbberbon/",
+      "https://github.com/haseona21",
+      "https://www.instagram.com/potatoesandflowers/"
+    ]
+  }
+  </script>
   <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -87,6 +108,23 @@
       display: inline !important;
     }
     .bio-resume:hover { color: var(--accent); border-color: var(--accent); }
+
+    .name-formal {
+      color: var(--muted);
+      font-weight: 300;
+      font-size: 0.9em;
+    }
+    .name-formal::before { content: '('; }
+    .name-formal::after  { content: ')'; }
+
+    .bio-text a {
+      color: var(--text);
+      text-decoration: underline;
+      text-decoration-color: var(--border);
+      text-underline-offset: 3px;
+      transition: text-decoration-color 0.15s;
+    }
+    .bio-text a:hover { text-decoration-color: var(--accent); }
 
     /* NOW */
     .now-item {
@@ -245,9 +283,15 @@
 
   <!-- BIO -->
   <section class="bio">
-    <p class="bio-name">Hi, I'm Christine Mae 👋</p>
+    <p class="bio-name">Hi, I'm <span class="name-formal">Christine</span> Mae 👋</p>
     <p class="bio-text">
-      Chief of Staff at Outset Capital, where I built fund operations from scratch — solo — for a 45-company portfolio. I own capital deployment, CRM, LP relations, deal flow screening, and event production (Thursday Nights in AI: 300+ applicants per event). Chemical engineer by training, UPLB cum laude at 19. I'm AI-native and build internal tools with Claude Code. Outside work: I track aircraft types, review every restaurant I visit, and plan trips with spreadsheets that would concern most people.
+      Currently Chief of Staff at Outset Capital, where I spearhead fund operations — managing deal flow, LP relations, and the many small things that keep a fund running. I've helped produce events like <a href="https://www.youtube.com/watch?v=jksGQhMtXjo&amp;list=PLhiu4AFpuCpqDwjWx-DvU6gpbAt9Mzbxw" target="_blank" rel="noopener">Thursday Nights in AI</a>, <a href="https://www.youtube.com/watch?v=FWqyqBlp8ng&amp;list=PLhiu4AFpuCprU4slou242mX98t_V8KxBc" target="_blank" rel="noopener">Portfolio Showcase</a>, and various investor dinners.
+    </p>
+    <p class="bio-text">
+      Before Outset, I ran operations at a real estate firm, overseeing the full business cycle from sourcing to closing. Before that, I was an IQ/OQ/PQ validation consultant for biopharma companies in the South San Francisco area. Chemical engineer by training — graduated at 19.
+    </p>
+    <p class="bio-text">
+      Outside work, you'll find me travelling, reading, gaming, or spending time with my cats and dog.
     </p>
     <div class="bio-links">
       <a href="https://www.linkedin.com/in/cmbberbon/" title="LinkedIn" target="_blank" rel="noopener">
