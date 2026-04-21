@@ -45,6 +45,16 @@
       --sans: 'Inter', sans-serif;
     }
 
+    body[data-theme="dark"] {
+      --bg: #111012;
+      --bg2: #1A171D;
+      --bg3: #24202A;
+      --text: #FFD7E5;
+      --muted: #D9A6BC;
+      --accent: #FF8DB4;
+      --border: #3A2C35;
+    }
+
     html { scroll-behavior: smooth; }
 
     body {
@@ -55,6 +65,28 @@
       line-height: 1.6;
       font-size: 15px;
       -webkit-font-smoothing: antialiased;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 999;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 0.4rem 0.75rem;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+    }
+    .theme-toggle:hover {
+      color: var(--accent);
+      border-color: var(--accent);
     }
 
     main { max-width: 680px; margin: 0 auto; padding: 5rem 2rem 6rem; }
@@ -299,6 +331,7 @@
   </style>
 </head>
 <body>
+<button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">Dark</button>
 
 <main>
 
@@ -459,6 +492,23 @@
 </main>
 
 <script>
+  const themeToggle = document.getElementById('theme-toggle');
+  const savedTheme = localStorage.getItem('theme');
+  const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  let activeTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+
+  function setTheme(theme) {
+    activeTheme = theme;
+    document.body.setAttribute('data-theme', theme);
+    themeToggle.textContent = theme === 'dark' ? 'Light' : 'Dark';
+    localStorage.setItem('theme', theme);
+    applyMapTheme(theme);
+  }
+
+  themeToggle.addEventListener('click', () => {
+    setTheme(activeTheme === 'dark' ? 'light' : 'dark');
+  });
+
   // ── REVIEWS MAP ──
   // Use full Web Mercator latitude range to avoid clipping artifacts
   // that can appear as horizontal "misaligned" bands.
@@ -489,23 +539,38 @@
   window.addEventListener('resize', fitMapSoon);
   window.addEventListener('orientationchange', fitMapSoon);
 
-  // Stable raster base map (no labels), avoids GeoJSON polygon artifacts.
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
-    attribution: '© OpenStreetMap © CARTO',
-    maxZoom: 19,
-    noWrap: true
-  }).addTo(map);
-
   // Labels-only tile layer rendered above everything
   map.createPane('labels');
   map.getPane('labels').style.zIndex = 650;
   map.getPane('labels').style.pointerEvents = 'none';
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
-    attribution: '© OpenStreetMap © CARTO',
-    maxZoom: 19,
-    noWrap: true,
-    pane: 'labels'
-  }).addTo(map);
+
+  let baseLayer;
+  let labelsLayer;
+
+  function applyMapTheme(theme) {
+    if (baseLayer) map.removeLayer(baseLayer);
+    if (labelsLayer) map.removeLayer(labelsLayer);
+
+    const isDark = theme === 'dark';
+    baseLayer = L.tileLayer(
+      `https://{s}.basemaps.cartocdn.com/${isDark ? 'dark_nolabels' : 'light_nolabels'}/{z}/{x}/{y}{r}.png`,
+      {
+        attribution: '© OpenStreetMap © CARTO',
+        maxZoom: 19,
+        noWrap: true
+      }
+    ).addTo(map);
+
+    labelsLayer = L.tileLayer(
+      `https://{s}.basemaps.cartocdn.com/${isDark ? 'dark_only_labels' : 'light_only_labels'}/{z}/{x}/{y}{r}.png`,
+      {
+        attribution: '© OpenStreetMap © CARTO',
+        maxZoom: 19,
+        noWrap: true,
+        pane: 'labels'
+      }
+    ).addTo(map);
+  }
 
   L.control.zoom({ position: 'bottomright' }).addTo(map);
 
@@ -571,6 +636,8 @@
     }
   }
   fetchWeather();
+
+  setTheme(activeTheme);
 </script>
 
 </body>
