@@ -489,6 +489,13 @@
   window.addEventListener('resize', fitMapSoon);
   window.addEventListener('orientationchange', fitMapSoon);
 
+  // Stable raster base map (no labels), avoids GeoJSON polygon artifacts.
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap © CARTO',
+    maxZoom: 19,
+    noWrap: true
+  }).addTo(map);
+
   // Labels-only tile layer rendered above everything
   map.createPane('labels');
   map.getPane('labels').style.zIndex = 650;
@@ -501,24 +508,6 @@
   }).addTo(map);
 
   L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-  // Philippines=608, Singapore=702, Japan=392, UAE=784, HK=344, US=840, Canada=124
-  const VISITED = new Set([608, 702, 392, 784, 344, 840, 124]);
-  const countriesRenderer = L.canvas({ padding: 0.5 });
-
-  fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
-    .then(r => r.json())
-    .then(topo => {
-      const countries = topojson.feature(topo, topo.objects.countries);
-      L.geoJSON(countries, {
-        renderer: countriesRenderer,
-        style: f => VISITED.has(+f.id)
-          ? { fillColor: '#C4A090', fillOpacity: 1, weight: 0.5, color: '#B89080', opacity: 0.4 }
-          : { fillColor: '#E0D9D0', fillOpacity: 1, weight: 0.3, color: '#CEC7BE', opacity: 0.5 },
-        interactive: false
-      }).addTo(map);
-      fitMapSoon();
-    });
 
   const dot = L.divIcon({
     className: '',
