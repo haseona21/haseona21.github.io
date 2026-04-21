@@ -221,7 +221,25 @@
     }
 
     .map-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
-    #leaflet-map { background: #FAF8F5; }
+    #leaflet-map {
+      width: 100%;
+      height: 100%;
+      background: #FAF8F5;
+    }
+
+    /* Keep Leaflet tile sizing immune to global resets. */
+    #leaflet-map .leaflet-container,
+    #leaflet-map .leaflet-pane,
+    #leaflet-map .leaflet-tile,
+    #leaflet-map .leaflet-marker-icon,
+    #leaflet-map .leaflet-marker-shadow {
+      box-sizing: content-box;
+    }
+
+    #leaflet-map .leaflet-tile {
+      max-width: none !important;
+      max-height: none !important;
+    }
 
     /* PROJECTS */
     .project-item {
@@ -424,7 +442,7 @@
   <section id="travel">
     <p class="section-label">Travel</p>
     <div class="map-wrap">
-      <div id="leaflet-map" style="width:100%;height:100%;"></div>
+      <div id="leaflet-map"></div>
     </div>
     <p class="map-note">* places I've reviewed on Google Maps</p>
   </section>
@@ -442,7 +460,9 @@
 
 <script>
   // ── REVIEWS MAP ──
-  const WORLD_BOUNDS = [[-60, -180], [82, 180]];
+  // Use full Web Mercator latitude range to avoid clipping artifacts
+  // that can appear as horizontal "misaligned" bands.
+  const WORLD_BOUNDS = [[-85, -180], [85, 180]];
   const map = L.map('leaflet-map', {
     zoomControl: false,
     scrollWheelZoom: false,
@@ -452,9 +472,21 @@
   });
   map.fitBounds(WORLD_BOUNDS, { animate: false });
 
-  function fitMap() { map.invalidateSize(); map.fitBounds(WORLD_BOUNDS, { animate: false }); }
-  new ResizeObserver(fitMap).observe(document.getElementById('leaflet-map').parentElement);
-  window.addEventListener('load', fitMap);
+  function fitMap() {
+    map.invalidateSize();
+    map.fitBounds(WORLD_BOUNDS, { animate: false });
+  }
+
+  function fitMapSoon() {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(fitMap);
+    });
+  }
+
+  new ResizeObserver(fitMapSoon).observe(document.querySelector('.map-wrap'));
+  window.addEventListener('load', fitMapSoon);
+  window.addEventListener('resize', fitMapSoon);
+  window.addEventListener('orientationchange', fitMapSoon);
 
   // Labels-only tile layer rendered above everything
   map.createPane('labels');
@@ -482,6 +514,7 @@
           : { fillColor: '#E0D9D0', fillOpacity: 1, weight: 0.3, color: '#CEC7BE', opacity: 0.5 },
         interactive: false
       }).addTo(map);
+      fitMapSoon();
     });
 
   const dot = L.divIcon({
@@ -503,6 +536,7 @@
           .bindPopup(`<strong>${name}</strong>${stars ? `<br><span style="color:#C4836A">${stars}</span>` : ''}<br><small>${address}</small>${mapsLink}`)
           .addTo(map);
       });
+      fitMapSoon();
     });
 
   // ── GITHUB PROJECTS ──
