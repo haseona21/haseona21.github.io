@@ -509,6 +509,29 @@
     setTheme(activeTheme === 'dark' ? 'light' : 'dark');
   });
 
+  function parseWttrTimeToday(timeStr) {
+    if (!timeStr) return null;
+    const now = new Date();
+    const match = timeStr.trim().match(/^(\d{1,2}):(\d{2})\s*([AP]M)$/i);
+    if (!match) return null;
+    let hour = Number(match[1]) % 12;
+    const minute = Number(match[2]);
+    const ampm = match[3].toUpperCase();
+    if (ampm === 'PM') hour += 12;
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute, 0, 0);
+  }
+
+  function setThemeByChicagoSunTimes(sunriseStr, sunsetStr) {
+    const sunrise = parseWttrTimeToday(sunriseStr);
+    const sunset = parseWttrTimeToday(sunsetStr);
+    if (!sunrise || !sunset) return false;
+
+    const now = new Date();
+    const isDark = now < sunrise || now >= sunset;
+    setTheme(isDark ? 'dark' : 'light');
+    return true;
+  }
+
   // ── REVIEWS MAP ──
   // Use full Web Mercator latitude range to avoid clipping artifacts
   // that can appear as horizontal "misaligned" bands.
@@ -626,6 +649,8 @@
       const cur  = data.current_condition[0];
       const temp = cur.temp_F;
       const desc = cur.weatherDesc[0].value;
+      const astronomy = data.weather?.[0]?.astronomy?.[0];
+      setThemeByChicagoSunTimes(astronomy?.sunrise, astronomy?.sunset);
       el.innerHTML = `
         <span class="weather-temp">${temp}°F</span>
         <span class="weather-sep">·</span>
