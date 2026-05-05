@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Building CRM glue that doesn't fall over — Christine Mae Tse</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <meta name="description" content="Notes from building an event-driven daemon for a small VC fund's CRM ops — workflows, actions, an AI triage layer, and the failure modes that shaped the design."/>
+  <meta name="author" content="Christine Mae Tse"/>
+  <meta property="article:published_time" content="2026-05-05"/>
+  <meta property="og:title" content="Building CRM glue that doesn't fall over"/>
+  <meta property="og:description" content="Notes from building an event-driven daemon for a small VC fund's CRM ops."/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="https://haseona21.github.io/writing/event-driven-vc-ops.html"/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F7F4F0;
+      --bg2: #EDE9E3;
+      --bg3: #E5E0D8;
+      --text: #1A1714;
+      --muted: #8C8378;
+      --accent: #C4836A;
+      --border: #DDD8D0;
+      --mono: 'Geist Mono', monospace;
+      --sans: 'Inter', sans-serif;
+    }
+
+    body[data-theme="dark"] {
+      --bg: #111012;
+      --bg2: #1A171D;
+      --bg3: #24202A;
+      --text: #FFD7E5;
+      --muted: #D9A6BC;
+      --accent: #FF8DB4;
+      --border: #3A2C35;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-weight: 300;
+      line-height: 1.65;
+      font-size: 15.5px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 999;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 0.4rem 0.75rem;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+    }
+    .theme-toggle:hover { color: var(--accent); border-color: var(--accent); }
+
+    main { max-width: 680px; margin: 0 auto; padding: 5rem 2rem 6rem; }
+
+    .back {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      margin-bottom: 3rem;
+      transition: color 0.15s;
+    }
+    .back:hover { color: var(--accent); }
+
+    .post-meta {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero-img {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin: 2rem 0 3rem;
+      border-radius: 6px;
+    }
+
+    h1 {
+      font-size: 1.85rem;
+      font-weight: 500;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.6rem;
+    }
+
+    .dek {
+      font-size: 1.05rem;
+      color: var(--muted);
+      font-weight: 300;
+      line-height: 1.55;
+      margin-bottom: 3rem;
+    }
+
+    article p { margin-bottom: 1.2rem; }
+
+    article h2 {
+      font-size: 1.15rem;
+      font-weight: 500;
+      margin-top: 2.75rem;
+      margin-bottom: 1rem;
+      letter-spacing: -0.005em;
+    }
+
+    article h3 {
+      font-size: 0.95rem;
+      font-weight: 500;
+      margin-top: 1.75rem;
+      margin-bottom: 0.6rem;
+      color: var(--text);
+    }
+
+    article ul, article ol {
+      margin: 0 0 1.2rem 1.25rem;
+      padding-left: 0.5rem;
+    }
+    article li { margin-bottom: 0.4rem; }
+
+    article a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.15s;
+    }
+    article a:hover { border-bottom-color: var(--accent); }
+
+    article code {
+      font-family: var(--mono);
+      font-size: 0.85em;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.05em 0.35em;
+    }
+
+    article pre {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.85rem 1rem;
+      overflow-x: auto;
+      margin: 1.2rem 0;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      line-height: 1.55;
+    }
+    article pre code {
+      background: transparent;
+      border: none;
+      padding: 0;
+      font-size: inherit;
+    }
+
+    article blockquote {
+      margin: 1.25rem 0;
+      padding-left: 1rem;
+      border-left: 2px solid var(--accent);
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .footer-note {
+      margin-top: 4rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .footer-note a { color: var(--accent); text-decoration: none; }
+    .footer-note a:hover { border-bottom: 1px solid var(--accent); }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">Dark</button>
+
+  <main>
+    <a class="back" href="../">← back</a>
+
+    <p class="post-meta">May 5, 2026 · ~7 min read</p>
+    <h1>Building CRM glue that doesn't fall over</h1>
+
+    <article>
+      <p>Before AI, I was doing a lot of manual watching. And for a 2-person fund, things are bound to slip through the cracks — a deal that didn't get followed up, a call recap that never made it into the CRM, an inbound email that sat there because nobody noticed it. Not because we were bad at ops. Just because there's only so much two people can catch.</p>
+
+      <p>Now with my BFF Claude Code, I turned it into a system.</p>
+
+      <p>Here's what I built, why I built it that way, and what broke before I got it right.</p>
+
+      <h2>The setup</h2>
+
+      <p>I run CRM and automation at a small VC firm. The CRM is Attio. Data flows in from everywhere — Gmail, Google Calendar, Fathom call recordings, Mixmax, Slack, Google Sheets someone on the team is maintaining by hand. None of these systems agree on what "a deal" is or when something happened. My job is to make them agree.</p>
+
+      <p>I patched this manually. It mostly worked. It also broke constantly in the worst possible way — the kind where the report still shows up in Slack, it's just empty, or wrong, and nobody notices for three days.</p>
+
+      <p>This spring I rewrote the whole thing as a long-running daemon. It's about 20,000 lines of TypeScript, runs on Railway, and handles the firm's daily operational loop end to end.</p>
+
+      <h2>Why a daemon and not more crons</h2>
+
+      <p>Cron is fine for actual repeating jobs. "Every morning at 6am, run this report." Great.</p>
+
+      <p>Cron is terrible for events. A Gmail thread arriving. A calendar event ending. A deal stage changing. To handle events with cron you end up polling — scan everything every 10 minutes, figure out what's new — and you spend most of your time reading data you already know about.</p>
+
+      <p>What pushed me over was Gmail. The team wanted a notification when an inbound founder email arrived. Polling Gmail every minute felt insane. Gmail has <a href="https://developers.google.com/gmail/api/guides/push">push notifications</a>, but to receive them you need a webhook server that's always running. So I needed a daemon. And once you have a daemon, every other polling job just becomes "subscribe to a heartbeat" — almost free to run.</p>
+
+      <h2>How it's structured</h2>
+
+      <p>Three layers, each does one thing:</p>
+
+      <ol>
+        <li><strong>Ingest</strong> — pulls or receives raw events from external systems. Normalizes everything into a small set of internal event types so the rest of the system doesn't have to care where data came from.</li>
+        <li><strong>Dispatch</strong> — given an event, decides which workflows should run. This is where most of the complexity lives and where most of my design work went.</li>
+        <li><strong>Workflows and actions</strong> — the actual business logic. A workflow runs automatically in response to an event. An action runs because a human asked for something. Both end up writing to Attio, posting to Slack, or sending mail.</li>
+      </ol>
+
+      <p>Postgres holds the state. Having a real database meant I could ask questions like "show me every event from the last week that triggered a workflow but never completed" — which turned out to be a question I needed to ask basically twice a week.</p>
+
+      <h2>The split that made everything simpler: workflows vs actions</h2>
+
+      <p>This was the most useful design decision in the whole rewrite.</p>
+
+      <p><strong>Workflows</strong> fire automatically. They answer "what should happen because this thing happened?"</p>
+
+      <ul>
+        <li>Meeting ended → enrich participants in Attio, attach the Fathom link, post a recap to Slack</li>
+        <li>Founder emailed inbound → triage, add to pipeline if new, notify the team</li>
+        <li>Deal moved to Reject → check if we owe them a response, queue one if so</li>
+      </ul>
+
+      <p><strong>Actions</strong> fire because a human asked. They answer "what should happen because someone wants it?"</p>
+
+      <ul>
+        <li>"Reject this person, they have no email" → mark the deal, write the reason, drop from outreach</li>
+        <li>"Add this person to the Mixmax sequence" → resolve, validate, enqueue</li>
+      </ul>
+
+      <p>They look similar on the surface so the temptation is to merge them. I tried that first. It was a mistake.</p>
+
+      <p>Workflows need to be idempotent — a webhook might fire twice for the same event and the system cannot break when that happens. Actions are one-shot — a human clicked once and they're waiting for a response.</p>
+
+      <p>Once I split them, both got simpler. The workflow registry handles idempotency keys. The action registry handles user-facing error messages. Neither has to care about the other's problems.</p>
+
+      <h2>The AI triage layer: one handler, not the brain</h2>
+
+      <p>The daemon classifies inbound emails using Claude — is this a founder pitch, a portfolio update, an LP request, a vendor, a newsletter? Claude writes the classification into the database. A deterministic dispatcher reads it and routes to the right workflow.</p>
+
+      <p>The key thing I got wrong early: I had Claude deciding which workflow to fire. That was bad in all the ways you'd expect. Non-deterministic, slow, expensive, impossible to debug.</p>
+
+      <p>The fix was simple: demote the LLM to one specific job. Classification of messy free text — that's a job for Claude. Routing based on a known label — that's a job for code.</p>
+
+      <p><strong>Use the LLM where the input is fuzzy. Use code where the logic is clear.</strong> Mixing them gives you a system you can't reason about.</p>
+
+      <h2>The three things that broke and taught me the most</h2>
+
+      <h3>1. Silent stuck events</h3>
+
+      <p>When a workflow failed, it would log the error and move on. The next event for the same entity would also fail silently. After a week I noticed a deal that was supposed to be at "post-call" was still at "call scheduled" — the workflow had been failing every time because of a transient API error nobody caught.</p>
+
+      <p>More retries wouldn't have helped. They'd have hidden the problem longer. The fix was a health check script: "which events are in a state where a workflow should have run but didn't?" If anything shows up, something is wrong.</p>
+
+      <p>Every long-running daemon needs this query. Without it, you only find out about failures when a human notices the absence of something — the worst possible monitoring signal.</p>
+
+      <h3>2. The freeze button</h3>
+
+      <p>I shipped a workflow change on a Friday with a subtle bug. By Monday, a weekend's worth of events had run through buggy code and written wrong data to twenty deals. Reverting the code didn't fix the data. The cleanup took half a day.</p>
+
+      <p>I added two scripts: <code>freeze</code> and <code>unfreeze</code>. They flip one boolean in Postgres. Every workflow checks it first and exits early if it's set. Now if something looks wrong, I can stop everything in 5 seconds.</p>
+
+      <p>Not glamorous. Probably the most valuable 30 lines of code in the whole repo.</p>
+
+      <h3>3. The error log as a weekly ritual</h3>
+
+      <p>I have a helper that any workflow can call when something goes wrong. It logs the error, the workflow name, the event ID, and a note to a <code>workflow_errors</code> table. Once a week I read through it.</p>
+
+      <p>The value isn't debugging individual failures — logs handle that. It's seeing patterns. Two months of rows told me which external API was flaky, which Attio attributes the team kept editing in incompatible ways, and which workflows had assumptions that no longer matched how we actually worked. None of that was visible from individual log lines.</p>
+
+      <h2>What I'd do differently</h2>
+
+      <ul>
+        <li><strong>Pick a real database on day one.</strong> I started with JSON files. Two months later I was migrating to Postgres with a thousand events to backfill. The complexity of a database is much smaller than the complexity of not having one.</li>
+        <li><strong>Write the introspection scripts before you need them.</strong> The health check scripts I built during incidents are now the most-used tools in the repo. If I'd written them first, I'd have caught the stuck-events bug a month earlier.</li>
+        <li><strong>Split workflows from actions from the start.</strong> The cost on day one is zero. The cost after the fact is a refactor.</li>
+        <li><strong>Don't run production on a personal cloud account.</strong> The daemon lived on my Railway account for months. Same architecture, but it should have been on a firm-owned account with proper access controls from the beginning.</li>
+        <li><strong>Treat the LLM as a function, not a manager.</strong> One specific judgment per call. Let code do the orchestration.</li>
+      </ul>
+
+      <h2>Closing</h2>
+
+      <p>The best thing about this kind of system is that it's invisible when it's working. Nobody notices that every call gets a recap automatically, that every inbound email hits the right pipeline state, that every sequence write-back happens in minutes. They just notice they're not chasing those things anymore.</p>
+
+      <p>That's the goal. Felt as the absence of friction.</p>
+
+      <p>If you're building something similar — at a fund, an agency, a small ops team — this is the architecture I'd start with. It's not glamorous. It stays in sync.</p>
+    </article>
+  </main>
+
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+    const stored = localStorage.getItem('theme');
+    const initial = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+    function setTheme(theme) {
+      document.body.setAttribute('data-theme', theme);
+      themeToggle.textContent = theme === 'dark' ? 'Light' : 'Dark';
+      localStorage.setItem('theme', theme);
+    }
+
+    setTheme(initial);
+
+    themeToggle.addEventListener('click', () => {
+      const current = document.body.getAttribute('data-theme');
+      setTheme(current === 'dark' ? 'light' : 'dark');
+    });
+  </script>
+</body>
+</html>
