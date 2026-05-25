@@ -329,10 +329,354 @@
       main { padding: 3rem 1.5rem 4rem; }
       .map-wrap { height: 260px; }
     }
+
+    /* SNAKE LAUNCHER (floating pill) */
+    .snake-launcher {
+      position: fixed;
+      right: 1rem;
+      bottom: 1rem;
+      z-index: 998;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 0.5rem 0.85rem;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: color 0.15s, border-color 0.15s, transform 0.15s;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .snake-launcher:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+    .snake-launcher .snake-pip {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 1px;
+      box-shadow: 8px 0 0 var(--accent), 4px 0 0 var(--accent);
+    }
+
+    /* SNAKE LAUNCHER (bio link) */
+    .bio-snake {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      background: none;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      padding: 0 0 1px 0;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .bio-snake:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* SNAKE MODAL */
+    .snake-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      backdrop-filter: blur(2px);
+    }
+    .snake-modal.open { display: flex; }
+
+    .snake-frame {
+      background: #15131A;
+      border: 1px solid #2A252F;
+      color: #fff;
+      border-radius: 12px;
+      padding: 1rem 1rem 1.1rem;
+      width: min(520px, 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+    }
+
+    .snake-body {
+      display: flex;
+      gap: 0.75rem;
+      align-items: stretch;
+    }
+    .snake-body .snake-stage { flex: 1 1 auto; min-width: 0; }
+
+    .snake-leaderboard {
+      width: 130px;
+      flex-shrink: 0;
+      background: #1F1B25;
+      border: 1px solid #2A252F;
+      border-radius: 6px;
+      padding: 0.55rem 0.6rem 0.55rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      font-family: var(--mono);
+    }
+    .snake-board-title {
+      color: #fff;
+      opacity: 0.6;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-size: 0.58rem;
+      padding-bottom: 0.3rem;
+      border-bottom: 1px solid #2A252F;
+    }
+    .snake-leaderboard ol {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .snake-leaderboard li {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.4rem;
+      color: #fff;
+      font-size: 0.7rem;
+    }
+    .snake-leaderboard li .snake-rank { color: rgba(255,255,255,0.55); width: 0.9rem; flex-shrink: 0; }
+    .snake-leaderboard li .snake-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .snake-leaderboard li .snake-points { color: #fff; }
+    .snake-leaderboard li.snake-empty { color: rgba(255,255,255,0.25); }
+    .snake-leaderboard li.snake-empty .snake-points { color: rgba(255,255,255,0.25); }
+
+    .snake-nameform {
+      display: flex;
+      gap: 0.4rem;
+      margin-top: 0.4rem;
+    }
+    .snake-nameform.hidden { display: none; }
+    .snake-nameform input {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      padding: 0.4rem 0.55rem;
+      background: #15131A;
+      border: 1px solid #3A3340;
+      border-radius: 4px;
+      color: #fff;
+      letter-spacing: 0.05em;
+      width: 110px;
+      outline: none;
+    }
+    .snake-nameform input::placeholder { color: rgba(255,255,255,0.35); }
+    .snake-nameform input:focus { border-color: var(--accent); }
+    .snake-nameform button {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.4rem 0.7rem;
+      background: var(--accent);
+      border: none;
+      border-radius: 4px;
+      color: var(--bg);
+      cursor: pointer;
+    }
+    .snake-overlay.entering { cursor: default; }
+
+    .snake-rick {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+    }
+    .snake-rick.hidden { display: none; }
+    .snake-rick-head {
+      padding: 0.45rem 0.6rem;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #fff;
+      text-align: center;
+      background: #15131A;
+      border-bottom: 1px solid #2A252F;
+    }
+    .snake-rick-video {
+      flex: 1 1 auto;
+      min-height: 0;
+      position: relative;
+    }
+    .snake-rick-video iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+    .snake-rick-replay {
+      padding: 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fff;
+      background: #15131A;
+      border: none;
+      border-top: 1px solid #2A252F;
+      cursor: pointer;
+      width: 100%;
+      transition: color 0.15s;
+    }
+    .snake-rick-replay:hover { color: var(--accent); }
+
+    @media (max-width: 520px) {
+      .snake-body { flex-direction: column; }
+      .snake-leaderboard { width: 100%; }
+      .snake-leaderboard ol { flex-direction: row; flex-wrap: wrap; gap: 0.5rem 1rem; }
+      .snake-leaderboard li { flex: 1 1 30%; min-width: 90px; }
+    }
+
+    .snake-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+    .snake-bar .snake-title { color: #fff; font-weight: 500; }
+    .snake-bar .snake-close {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      line-height: 1;
+      padding: 0.15rem 0.35rem;
+      transition: color 0.15s;
+    }
+    .snake-bar .snake-close:hover { color: #fff; }
+
+    .snake-stage {
+      position: relative;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      aspect-ratio: 1 / 1;
+    }
+    .snake-stage canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      touch-action: none;
+    }
+
+    .snake-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      font-family: var(--mono);
+      text-align: center;
+      padding: 1rem;
+      cursor: pointer;
+    }
+    .snake-overlay.hidden { display: none; }
+    .snake-overlay .snake-headline {
+      font-size: 0.95rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+    .snake-overlay .snake-sub {
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+
+    .snake-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+    .snake-foot .snake-keys { color: #fff; opacity: 0.85; }
   </style>
 </head>
 <body>
 <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">Dark</button>
+
+<button type="button" class="snake-launcher" id="snake-launcher-fab" data-snake-open aria-label="Play snake">
+  <span class="snake-pip" aria-hidden="true"></span>
+  <span>play snake</span>
+</button>
+
+<div class="snake-modal" id="snake-modal" role="dialog" aria-modal="true" aria-label="Snake game">
+  <div class="snake-frame">
+    <div class="snake-bar">
+      <span class="snake-title">snake</span>
+      <span>score <span id="snake-score">0</span> · best <span id="snake-best">0</span></span>
+      <button type="button" class="snake-close" id="snake-close" aria-label="Close">✕</button>
+    </div>
+    <div class="snake-body">
+      <div class="snake-stage">
+        <canvas id="snake-canvas" width="320" height="320"></canvas>
+        <div class="snake-rick hidden" id="snake-rick">
+          <div class="snake-rick-head">too bad</div>
+          <div class="snake-rick-video" id="snake-rick-video"></div>
+          <button type="button" class="snake-rick-replay" id="snake-rick-replay">tap to play again</button>
+        </div>
+        <div class="snake-overlay" id="snake-overlay">
+          <div class="snake-headline" id="snake-headline">snake</div>
+          <div class="snake-sub" id="snake-sub">tap or press space to start</div>
+          <form class="snake-nameform hidden" id="snake-nameform">
+            <input type="text" id="snake-name" maxlength="8" placeholder="name" autocomplete="off" spellcheck="false"/>
+            <button type="submit">save</button>
+          </form>
+        </div>
+      </div>
+      <aside class="snake-leaderboard">
+        <div class="snake-board-title">top 5</div>
+        <ol id="snake-board"></ol>
+      </aside>
+    </div>
+    <div class="snake-foot">
+      <span class="snake-keys">WASD / arrows</span>
+      <span>tap a side on mobile</span>
+    </div>
+  </div>
+</div>
 
 <main>
 
@@ -368,6 +712,7 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
       </a>
       <a href="./Christine_Tse_Resume.pdf" class="bio-resume" target="_blank" rel="noopener">resume ↗</a>
+      <button type="button" class="bio-snake" id="snake-launcher" data-snake-open aria-label="Play snake">play snake ↗</button>
     </div>
   </section>
 
@@ -671,6 +1016,340 @@
   fetchWeather();
 
   setTheme(activeTheme);
+
+  // ── SNAKE ──
+  (() => {
+    const launchers = document.querySelectorAll('[data-snake-open]');
+    const modal = document.getElementById('snake-modal');
+    const closeBtn = document.getElementById('snake-close');
+    const canvas = document.getElementById('snake-canvas');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('snake-score');
+    const bestEl = document.getElementById('snake-best');
+    const overlay = document.getElementById('snake-overlay');
+    const headline = document.getElementById('snake-headline');
+    const sub = document.getElementById('snake-sub');
+
+    const nameform = document.getElementById('snake-nameform');
+    const nameInput = document.getElementById('snake-name');
+    const boardList = document.getElementById('snake-board');
+
+    const GRID = 16;
+    const CELL = canvas.width / GRID;
+    const TICK_START = 200;
+    const TICK_FLOOR = 60;
+    const TICK_STEP = 8;
+    const BOARD_KEY = 'snake-board';
+    const BOARD_SIZE = 5;
+
+    let snake, dir, nextDir, food, score, best, running, alive, awaitingName, awaitingRickroll, lastTick, rafId;
+    const rickEl = document.getElementById('snake-rick');
+    const rickVideo = document.getElementById('snake-rick-video');
+    const rickReplay = document.getElementById('snake-rick-replay');
+    const RICK_EMBED = 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&list=RDdQw4w9WgXcQ';
+
+    function tickMs() {
+      return Math.max(TICK_FLOOR, TICK_START - score * TICK_STEP);
+    }
+
+    const catImg = new Image();
+    catImg.src = './favicon.svg';
+    catImg.onload = () => { if (snake) draw(); };
+    ctx.imageSmoothingEnabled = false;
+
+    // Crying cat: same sprite + sad-eye masks + blue tear streaks
+    const cryCatSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="1" y="1" width="2" height="1" fill="#F4922A"/><rect x="1" y="2" width="3" height="1" fill="#F4922A"/><rect x="12" y="1" width="2" height="1" fill="#F4922A"/><rect x="11" y="2" width="3" height="1" fill="#F4922A"/><rect x="1" y="3" width="13" height="1" fill="#F4922A"/><rect x="0" y="4" width="15" height="2" fill="#F4922A"/><rect x="5" y="3" width="1" height="3" fill="#C96B1A"/><rect x="7" y="3" width="1" height="3" fill="#C96B1A"/><rect x="9" y="3" width="1" height="3" fill="#C96B1A"/><rect x="0" y="6" width="4" height="2" fill="#F4922A"/><rect x="6" y="6" width="4" height="2" fill="#F4922A"/><rect x="12" y="6" width="3" height="2" fill="#F4922A"/><rect x="4" y="6" width="2" height="2" fill="#2D1F14"/><rect x="10" y="6" width="2" height="2" fill="#2D1F14"/><rect x="0" y="8" width="15" height="1" fill="#F4922A"/><rect x="0" y="9" width="7" height="1" fill="#F4922A"/><rect x="8" y="9" width="7" height="1" fill="#F4922A"/><rect x="0" y="10" width="15" height="1" fill="#F4922A"/><rect x="7" y="9" width="1" height="1" fill="#E8617A"/><rect x="1" y="11" width="13" height="1" fill="#F4922A"/><rect x="2" y="12" width="11" height="1" fill="#F4922A"/><rect x="4" y="6" width="2" height="1" fill="#F4922A"/><rect x="10" y="6" width="2" height="1" fill="#F4922A"/><rect x="4" y="8" width="1" height="3" fill="#5FB0D9"/><rect x="11" y="8" width="1" height="3" fill="#5FB0D9"/></svg>`;
+    const cryCatImg = new Image();
+    cryCatImg.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(cryCatSvg);
+    cryCatImg.onload = () => { if (snake) draw(); };
+
+    best = Number(localStorage.getItem('snake-best') || 0);
+    bestEl.textContent = best;
+
+    function getBoard() {
+      try { return JSON.parse(localStorage.getItem(BOARD_KEY)) || []; }
+      catch { return []; }
+    }
+    function saveBoard(b) { localStorage.setItem(BOARD_KEY, JSON.stringify(b)); }
+    function qualifies(s) {
+      const b = getBoard();
+      return b.length < BOARD_SIZE || s > b[b.length - 1].score;
+    }
+    function addToBoard(name, s) {
+      const b = getBoard();
+      b.push({name, score: s});
+      b.sort((a, c) => c.score - a.score);
+      while (b.length > BOARD_SIZE) b.pop();
+      saveBoard(b);
+      renderBoard();
+    }
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    function renderBoard() {
+      const b = getBoard();
+      boardList.innerHTML = '';
+      for (let i = 0; i < BOARD_SIZE; i++) {
+        const entry = b[i];
+        const li = document.createElement('li');
+        if (entry) {
+          li.innerHTML = `<span class="snake-rank">${i+1}</span><span class="snake-name">${escapeHtml(entry.name)}</span><span class="snake-points">${entry.score}</span>`;
+        } else {
+          li.className = 'snake-empty';
+          li.innerHTML = `<span class="snake-rank">${i+1}</span><span class="snake-name">—</span><span class="snake-points">—</span>`;
+        }
+        boardList.appendChild(li);
+      }
+    }
+    renderBoard();
+
+    function reset() {
+      snake = [{x: 8, y: 8}, {x: 7, y: 8}, {x: 6, y: 8}];
+      dir = {x: 1, y: 0};
+      nextDir = dir;
+      score = 0;
+      scoreEl.textContent = score;
+      placeFood();
+      alive = true;
+      draw();
+    }
+
+    function placeFood() {
+      while (true) {
+        const f = {x: Math.floor(Math.random() * GRID), y: Math.floor(Math.random() * GRID)};
+        if (!snake.some(s => s.x === f.x && s.y === f.y)) { food = f; return; }
+      }
+    }
+
+    function step() {
+      dir = nextDir;
+      const head = {
+        x: (snake[0].x + dir.x + GRID) % GRID,
+        y: (snake[0].y + dir.y + GRID) % GRID
+      };
+      if (snake.some(s => s.x === head.x && s.y === head.y)) return gameOver();
+      snake.unshift(head);
+      if (head.x === food.x && head.y === food.y) {
+        score += 1;
+        scoreEl.textContent = score;
+        if (score > best) {
+          best = score;
+          bestEl.textContent = best;
+          localStorage.setItem('snake-best', best);
+        }
+        placeFood();
+      } else {
+        snake.pop();
+      }
+      draw();
+    }
+
+    function color(name) {
+      return getComputedStyle(document.body).getPropertyValue(name).trim();
+    }
+
+    function draw() {
+      const bg = color('--bg3');
+      const accent = color('--accent');
+      const text = color('--text');
+      const border = color('--border');
+
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // faint grid for Nokia LCD vibe
+      ctx.strokeStyle = border;
+      ctx.globalAlpha = 0.25;
+      ctx.lineWidth = 1;
+      for (let i = 1; i < GRID; i++) {
+        ctx.beginPath();
+        ctx.moveTo(i * CELL, 0);
+        ctx.lineTo(i * CELL, canvas.height);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, i * CELL);
+        ctx.lineTo(canvas.width, i * CELL);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+
+      // food: the pixel cat (cries on game over)
+      const sprite = (!alive && cryCatImg.complete && cryCatImg.naturalWidth) ? cryCatImg : catImg;
+      if (sprite.complete && sprite.naturalWidth) {
+        const pad = 1;
+        ctx.drawImage(sprite, food.x * CELL + pad, food.y * CELL + pad, CELL - pad * 2, CELL - pad * 2);
+      } else {
+        drawCell(food.x, food.y, accent, accent);
+      }
+
+      // snake
+      snake.forEach((seg, i) => {
+        drawCell(seg.x, seg.y, i === 0 ? accent : text, bg);
+      });
+    }
+
+    function drawCell(x, y, fill, inner) {
+      const pad = 2;
+      const innerPad = 5;
+      ctx.fillStyle = fill;
+      ctx.fillRect(x * CELL + pad, y * CELL + pad, CELL - pad * 2, CELL - pad * 2);
+      ctx.fillStyle = inner;
+      ctx.fillRect(x * CELL + innerPad, y * CELL + innerPad, CELL - innerPad * 2, CELL - innerPad * 2);
+    }
+
+    function loop(ts) {
+      if (!running) return;
+      if (!lastTick) lastTick = ts;
+      if (ts - lastTick >= tickMs()) {
+        lastTick = ts;
+        if (alive) step();
+      }
+      rafId = requestAnimationFrame(loop);
+    }
+
+    function start() {
+      if (awaitingName) return;
+      if (!alive) reset();
+      overlay.classList.add('hidden');
+      running = true;
+      lastTick = 0;
+      rafId = requestAnimationFrame(loop);
+    }
+
+    function stop() {
+      running = false;
+      if (rafId) cancelAnimationFrame(rafId);
+    }
+
+    function gameOver() {
+      alive = false;
+      stop();
+      draw();
+      if (score > 0 && qualifies(score)) {
+        awaitingName = true;
+        overlay.classList.add('entering');
+        headline.textContent = 'top 5!';
+        sub.textContent = `score ${score} · enter a name`;
+        nameInput.value = localStorage.getItem('snake-last-name') || '';
+        nameform.classList.remove('hidden');
+        overlay.classList.remove('hidden');
+        setTimeout(() => nameInput.focus(), 60);
+      } else {
+        awaitingRickroll = true;
+        headline.textContent = 'game over';
+        sub.textContent = `score ${score} · tap to try again`;
+        overlay.classList.remove('hidden');
+      }
+    }
+
+    function showRickroll() {
+      awaitingRickroll = false;
+      rickVideo.innerHTML = `<iframe src="${RICK_EMBED}" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+      rickEl.classList.remove('hidden');
+      overlay.classList.add('hidden');
+    }
+
+    function clearRickroll() {
+      rickVideo.innerHTML = '';
+      rickEl.classList.add('hidden');
+    }
+
+    rickReplay.addEventListener('click', () => {
+      clearRickroll();
+      reset();
+      start();
+    });
+
+    function open() {
+      modal.classList.add('open');
+      clearRickroll();
+      reset();
+      awaitingName = false;
+      awaitingRickroll = false;
+      nameform.classList.add('hidden');
+      overlay.classList.remove('entering');
+      headline.textContent = 'snake';
+      sub.textContent = 'tap or press space to start';
+      overlay.classList.remove('hidden');
+      renderBoard();
+    }
+
+    function close() {
+      modal.classList.remove('open');
+      stop();
+      clearRickroll();
+    }
+
+    nameform.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const raw = (nameInput.value || '').trim().slice(0, 8);
+      const name = (raw || 'anon').toLowerCase();
+      localStorage.setItem('snake-last-name', name);
+      addToBoard(name, score);
+      awaitingName = false;
+      awaitingRickroll = false; // top-5 players earn an actual replay
+      nameform.classList.add('hidden');
+      overlay.classList.remove('entering');
+      headline.textContent = 'game over';
+      sub.textContent = `score ${score} · tap to play again`;
+    });
+    nameform.addEventListener('click', (e) => e.stopPropagation());
+
+    function setDir(nx, ny) {
+      // prevent 180° reversal
+      if (snake.length > 1 && nx === -dir.x && ny === -dir.y) return;
+      nextDir = {x: nx, y: ny};
+    }
+
+    launchers.forEach(el => el.addEventListener('click', open));
+    closeBtn.addEventListener('click', close);
+    modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+
+    overlay.addEventListener('click', () => {
+      if (awaitingName) return;
+      if (awaitingRickroll) { showRickroll(); return; }
+      start();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!modal.classList.contains('open')) return;
+      const k = e.key.toLowerCase();
+      if (k === 'escape') { close(); return; }
+      if (awaitingName) return; // let the name input handle keys
+      if (k === ' ' || k === 'enter') {
+        if (!running || !alive) {
+          e.preventDefault();
+          if (awaitingRickroll) showRickroll(); else start();
+        }
+        return;
+      }
+      if (k === 'w' || k === 'arrowup') { setDir(0, -1); e.preventDefault(); }
+      else if (k === 's' || k === 'arrowdown') { setDir(0, 1); e.preventDefault(); }
+      else if (k === 'a' || k === 'arrowleft') { setDir(-1, 0); e.preventDefault(); }
+      else if (k === 'd' || k === 'arrowright') { setDir(1, 0); e.preventDefault(); }
+    });
+
+    // Touch: tap one of four triangular zones (split by diagonals through canvas center)
+    canvas.addEventListener('pointerdown', (e) => {
+      if (awaitingName) return;
+      if (awaitingRickroll) { showRickroll(); return; }
+      if (!running || !alive) { start(); return; }
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;   // 0..1
+      const y = (e.clientY - rect.top) / rect.height;   // 0..1
+      const dx = x - 0.5;
+      const dy = y - 0.5;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        setDir(dx > 0 ? 1 : -1, 0);
+      } else {
+        setDir(0, dy > 0 ? 1 : -1);
+      }
+    });
+
+    // Redraw on theme change so colors stay in sync
+    const themeObserver = new MutationObserver(() => { if (snake) draw(); });
+    themeObserver.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+  })();
 </script>
 
 </body>
