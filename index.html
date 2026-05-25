@@ -400,101 +400,12 @@
       color: #fff;
       border-radius: 12px;
       padding: 1rem 1rem 1.1rem;
-      width: min(520px, 100%);
+      width: min(360px, 100%);
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
       box-shadow: 0 20px 50px rgba(0,0,0,0.45);
     }
-
-    .snake-body {
-      display: flex;
-      gap: 0.75rem;
-      align-items: stretch;
-    }
-    .snake-body .snake-stage { flex: 1 1 auto; min-width: 0; }
-
-    .snake-leaderboard {
-      width: 130px;
-      flex-shrink: 0;
-      background: #1F1B25;
-      border: 1px solid #2A252F;
-      border-radius: 6px;
-      padding: 0.55rem 0.6rem 0.55rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-      font-family: var(--mono);
-    }
-    .snake-board-title {
-      color: #fff;
-      opacity: 0.6;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      font-size: 0.58rem;
-      padding-bottom: 0.3rem;
-      border-bottom: 1px solid #2A252F;
-    }
-    .snake-leaderboard ol {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-    }
-    .snake-leaderboard li {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 0.4rem;
-      color: #fff;
-      font-size: 0.7rem;
-    }
-    .snake-leaderboard li .snake-rank { color: rgba(255,255,255,0.55); width: 0.9rem; flex-shrink: 0; }
-    .snake-leaderboard li .snake-name {
-      flex: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .snake-leaderboard li .snake-points { color: #fff; }
-    .snake-leaderboard li.snake-empty { color: rgba(255,255,255,0.25); }
-    .snake-leaderboard li.snake-empty .snake-points { color: rgba(255,255,255,0.25); }
-
-    .snake-nameform {
-      display: flex;
-      gap: 0.4rem;
-      margin-top: 0.4rem;
-    }
-    .snake-nameform.hidden { display: none; }
-    .snake-nameform input {
-      font-family: var(--mono);
-      font-size: 0.75rem;
-      padding: 0.4rem 0.55rem;
-      background: #15131A;
-      border: 1px solid #3A3340;
-      border-radius: 4px;
-      color: #fff;
-      letter-spacing: 0.05em;
-      width: 110px;
-      outline: none;
-    }
-    .snake-nameform input::placeholder { color: rgba(255,255,255,0.35); }
-    .snake-nameform input:focus { border-color: var(--accent); }
-    .snake-nameform button {
-      font-family: var(--mono);
-      font-size: 0.6rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 0.4rem 0.7rem;
-      background: var(--accent);
-      border: none;
-      border-radius: 4px;
-      color: var(--bg);
-      cursor: pointer;
-    }
-    .snake-overlay.entering { cursor: default; }
 
     .snake-rick {
       position: absolute;
@@ -542,13 +453,6 @@
       transition: color 0.15s;
     }
     .snake-rick-replay:hover { color: var(--accent); }
-
-    @media (max-width: 520px) {
-      .snake-body { flex-direction: column; }
-      .snake-leaderboard { width: 100%; }
-      .snake-leaderboard ol { flex-direction: row; flex-wrap: wrap; gap: 0.5rem 1rem; }
-      .snake-leaderboard li { flex: 1 1 30%; min-width: 90px; }
-    }
 
     .snake-bar {
       display: flex;
@@ -649,27 +553,17 @@
       <span>score <span id="snake-score">0</span> · best <span id="snake-best">0</span></span>
       <button type="button" class="snake-close" id="snake-close" aria-label="Close">✕</button>
     </div>
-    <div class="snake-body">
-      <div class="snake-stage">
-        <canvas id="snake-canvas" width="320" height="320"></canvas>
-        <div class="snake-rick hidden" id="snake-rick">
-          <div class="snake-rick-head">too bad</div>
-          <div class="snake-rick-video" id="snake-rick-video"></div>
-          <button type="button" class="snake-rick-replay" id="snake-rick-replay">tap to play again</button>
-        </div>
-        <div class="snake-overlay" id="snake-overlay">
-          <div class="snake-headline" id="snake-headline">snake</div>
-          <div class="snake-sub" id="snake-sub">tap or press space to start</div>
-          <form class="snake-nameform hidden" id="snake-nameform">
-            <input type="text" id="snake-name" maxlength="8" placeholder="name" autocomplete="off" spellcheck="false"/>
-            <button type="submit">save</button>
-          </form>
-        </div>
+    <div class="snake-stage">
+      <canvas id="snake-canvas" width="320" height="320"></canvas>
+      <div class="snake-rick hidden" id="snake-rick">
+        <div class="snake-rick-head">too bad</div>
+        <div class="snake-rick-video" id="snake-rick-video"></div>
+        <button type="button" class="snake-rick-replay" id="snake-rick-replay">tap to play again</button>
       </div>
-      <aside class="snake-leaderboard">
-        <div class="snake-board-title">top 5</div>
-        <ol id="snake-board"></ol>
-      </aside>
+      <div class="snake-overlay" id="snake-overlay">
+        <div class="snake-headline" id="snake-headline">snake</div>
+        <div class="snake-sub" id="snake-sub">tap or press space to start</div>
+      </div>
     </div>
     <div class="snake-foot">
       <span class="snake-keys">WASD / arrows</span>
@@ -1030,19 +924,14 @@
     const headline = document.getElementById('snake-headline');
     const sub = document.getElementById('snake-sub');
 
-    const nameform = document.getElementById('snake-nameform');
-    const nameInput = document.getElementById('snake-name');
-    const boardList = document.getElementById('snake-board');
-
     const GRID = 16;
     const CELL = canvas.width / GRID;
     const TICK_START = 200;
     const TICK_FLOOR = 60;
     const TICK_STEP = 8;
-    const BOARD_KEY = 'snake-board';
-    const BOARD_SIZE = 5;
+    const RICKROLL_THRESHOLD = 5;
 
-    let snake, dir, nextDir, food, score, best, running, alive, awaitingName, awaitingRickroll, lastTick, rafId;
+    let snake, dir, nextDir, food, score, best, running, alive, awaitingRickroll, lastTick, rafId;
     const rickEl = document.getElementById('snake-rick');
     const rickVideo = document.getElementById('snake-rick-video');
     const rickReplay = document.getElementById('snake-rick-replay');
@@ -1065,43 +954,6 @@
 
     best = Number(localStorage.getItem('snake-best') || 0);
     bestEl.textContent = best;
-
-    function getBoard() {
-      try { return JSON.parse(localStorage.getItem(BOARD_KEY)) || []; }
-      catch { return []; }
-    }
-    function saveBoard(b) { localStorage.setItem(BOARD_KEY, JSON.stringify(b)); }
-    function qualifies(s) {
-      const b = getBoard();
-      return b.length < BOARD_SIZE || s > b[b.length - 1].score;
-    }
-    function addToBoard(name, s) {
-      const b = getBoard();
-      b.push({name, score: s});
-      b.sort((a, c) => c.score - a.score);
-      while (b.length > BOARD_SIZE) b.pop();
-      saveBoard(b);
-      renderBoard();
-    }
-    function escapeHtml(s) {
-      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-    }
-    function renderBoard() {
-      const b = getBoard();
-      boardList.innerHTML = '';
-      for (let i = 0; i < BOARD_SIZE; i++) {
-        const entry = b[i];
-        const li = document.createElement('li');
-        if (entry) {
-          li.innerHTML = `<span class="snake-rank">${i+1}</span><span class="snake-name">${escapeHtml(entry.name)}</span><span class="snake-points">${entry.score}</span>`;
-        } else {
-          li.className = 'snake-empty';
-          li.innerHTML = `<span class="snake-rank">${i+1}</span><span class="snake-name">—</span><span class="snake-points">—</span>`;
-        }
-        boardList.appendChild(li);
-      }
-    }
-    renderBoard();
 
     function reset() {
       snake = [{x: 8, y: 8}, {x: 7, y: 8}, {x: 6, y: 8}];
@@ -1208,7 +1060,6 @@
     }
 
     function start() {
-      if (awaitingName) return;
       if (!alive) reset();
       overlay.classList.add('hidden');
       running = true;
@@ -1225,21 +1076,14 @@
       alive = false;
       stop();
       draw();
-      if (score > 0 && qualifies(score)) {
-        awaitingName = true;
-        overlay.classList.add('entering');
-        headline.textContent = 'top 5!';
-        sub.textContent = `score ${score} · enter a name`;
-        nameInput.value = localStorage.getItem('snake-last-name') || '';
-        nameform.classList.remove('hidden');
-        overlay.classList.remove('hidden');
-        setTimeout(() => nameInput.focus(), 60);
-      } else {
+      headline.textContent = 'game over';
+      if (score < RICKROLL_THRESHOLD) {
         awaitingRickroll = true;
-        headline.textContent = 'game over';
         sub.textContent = `score ${score} · tap to try again`;
-        overlay.classList.remove('hidden');
+      } else {
+        sub.textContent = `score ${score} · tap to play again`;
       }
+      overlay.classList.remove('hidden');
     }
 
     function showRickroll() {
@@ -1264,14 +1108,10 @@
       modal.classList.add('open');
       clearRickroll();
       reset();
-      awaitingName = false;
       awaitingRickroll = false;
-      nameform.classList.add('hidden');
-      overlay.classList.remove('entering');
       headline.textContent = 'snake';
       sub.textContent = 'tap or press space to start';
       overlay.classList.remove('hidden');
-      renderBoard();
     }
 
     function close() {
@@ -1280,20 +1120,6 @@
       clearRickroll();
     }
 
-    nameform.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const raw = (nameInput.value || '').trim().slice(0, 8);
-      const name = (raw || 'anon').toLowerCase();
-      localStorage.setItem('snake-last-name', name);
-      addToBoard(name, score);
-      awaitingName = false;
-      awaitingRickroll = false; // top-5 players earn an actual replay
-      nameform.classList.add('hidden');
-      overlay.classList.remove('entering');
-      headline.textContent = 'game over';
-      sub.textContent = `score ${score} · tap to play again`;
-    });
-    nameform.addEventListener('click', (e) => e.stopPropagation());
 
     function setDir(nx, ny) {
       // prevent 180° reversal
@@ -1306,7 +1132,6 @@
     modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
 
     overlay.addEventListener('click', () => {
-      if (awaitingName) return;
       if (awaitingRickroll) { showRickroll(); return; }
       start();
     });
@@ -1315,7 +1140,6 @@
       if (!modal.classList.contains('open')) return;
       const k = e.key.toLowerCase();
       if (k === 'escape') { close(); return; }
-      if (awaitingName) return; // let the name input handle keys
       if (k === ' ' || k === 'enter') {
         if (!running || !alive) {
           e.preventDefault();
@@ -1331,7 +1155,6 @@
 
     // Touch: tap one of four triangular zones (split by diagonals through canvas center)
     canvas.addEventListener('pointerdown', (e) => {
-      if (awaitingName) return;
       if (awaitingRickroll) { showRickroll(); return; }
       if (!running || !alive) { start(); return; }
       const rect = canvas.getBoundingClientRect();
