@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>I built a robot to write like my boss — Christine Mae Tse</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <meta name="description" content="Notes on /alify — a Claude skill that rewrites my drafts in my boss's voice, built on a hand-written voice profile and an append-only correction log."/>
+  <meta name="author" content="Christine Mae Tse"/>
+  <meta property="article:published_time" content="2026-05-25"/>
+  <meta property="og:title" content="I built a robot to write like my boss"/>
+  <meta property="og:description" content="Notes on /alify — a Claude skill that rewrites my drafts in my boss's voice."/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="https://haseona21.github.io/writing/alify-voice-clone.html"/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F7F4F0;
+      --bg2: #EDE9E3;
+      --bg3: #E5E0D8;
+      --text: #1A1714;
+      --muted: #8C8378;
+      --accent: #C4836A;
+      --border: #DDD8D0;
+      --mono: 'Geist Mono', monospace;
+      --sans: 'Inter', sans-serif;
+    }
+
+    body[data-theme="dark"] {
+      --bg: #111012;
+      --bg2: #1A171D;
+      --bg3: #24202A;
+      --text: #FFD7E5;
+      --muted: #D9A6BC;
+      --accent: #FF8DB4;
+      --border: #3A2C35;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-weight: 300;
+      line-height: 1.65;
+      font-size: 15.5px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 999;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 0.4rem 0.75rem;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+    }
+    .theme-toggle:hover { color: var(--accent); border-color: var(--accent); }
+
+    main { max-width: 680px; margin: 0 auto; padding: 5rem 2rem 6rem; }
+
+    .back {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      margin-bottom: 3rem;
+      transition: color 0.15s;
+    }
+    .back:hover { color: var(--accent); }
+
+    .post-meta {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero-img {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin: 2rem 0 3rem;
+      border-radius: 6px;
+    }
+
+    h1 {
+      font-size: 1.85rem;
+      font-weight: 500;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.6rem;
+    }
+
+    .dek {
+      font-size: 1.05rem;
+      color: var(--muted);
+      font-weight: 300;
+      line-height: 1.55;
+      margin-bottom: 3rem;
+    }
+
+    article p { margin-bottom: 1.2rem; }
+
+    article h2 {
+      font-size: 1.15rem;
+      font-weight: 500;
+      margin-top: 2.75rem;
+      margin-bottom: 1rem;
+      letter-spacing: -0.005em;
+    }
+
+    article h3 {
+      font-size: 0.95rem;
+      font-weight: 500;
+      margin-top: 1.75rem;
+      margin-bottom: 0.6rem;
+      color: var(--text);
+    }
+
+    article ul, article ol {
+      margin: 0 0 1.2rem 1.25rem;
+      padding-left: 0.5rem;
+    }
+    article li { margin-bottom: 0.4rem; }
+
+    article a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.15s;
+    }
+    article a:hover { border-bottom-color: var(--accent); }
+
+    article code {
+      font-family: var(--mono);
+      font-size: 0.85em;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.05em 0.35em;
+    }
+
+    article pre {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.85rem 1rem;
+      overflow-x: auto;
+      margin: 1.2rem 0;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      line-height: 1.55;
+    }
+    article pre code {
+      background: transparent;
+      border: none;
+      padding: 0;
+      font-size: inherit;
+    }
+
+    article blockquote {
+      margin: 1.25rem 0;
+      padding-left: 1rem;
+      border-left: 2px solid var(--accent);
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .footer-note {
+      margin-top: 4rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .footer-note a { color: var(--accent); text-decoration: none; }
+    .footer-note a:hover { border-bottom: 1px solid var(--accent); }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">Dark</button>
+
+  <main>
+    <a class="back" href="../">← back</a>
+
+    <p class="post-meta">May 25, 2026 · ~4 min read</p>
+    <h1>I built a robot to write like my boss</h1>
+
+    <article>
+      <p>I work at Outset Capital. Our GP, Ali Rohde (<a href="https://alibrohde.com/blog" target="_blank" rel="noopener">check out her blog here</a>!), is a stellar writer. I am also a writer, in the way that everyone with a job is a writer — emails, notes, the occasional LinkedIn post I delete before publishing. I'd like to have that verbose writing that can tell a story. Instead mine comes out sounding like a slightly anxious LLM trying to make payroll.</p>
+
+      <p>So I built a Claude skill. I call it <code>/alify</code>.</p>
+
+      <p>The robot reads a file Ali wrote about her own voice — a plain markdown file at <code>voice/ali_voice_profile.md</code> with rules like <em>Chicago intro-phrase comma, always</em> and <em>digits over spelled-out numbers, everywhere</em> and <em>no hedging, state the take</em>. Then it rewrites whatever I give it.</p>
+
+      <p>This is not training. The robot did not "absorb Ali's style." The robot is reading a file and following the rules in it.</p>
+
+      <p>Here's what most AI voice-cloning content sounds like: feed a model 10,000 of your tweets, let it absorb your style, see what comes out. The output is vibes-adjacent. It sounds like a smoothie of you and the model. You can't tell what the model learned versus what it made up, and when the output is wrong, you have no idea where to fix it.</p>
+
+      <p>Here's what <code>/alify</code> looks like instead:</p>
+
+      <ol>
+        <li>A hand-written voice profile. Ali wrote it. Specific rules, surface-by-surface — email register vs X register vs LP-facing work. Boring, manual, slow.</li>
+        <li>An append-only log of every time I push back on a rewrite. That one I wrote. The corrections live in <code>feedback_log.md</code>.</li>
+        <li>The tool reads both before it touches anything.</li>
+      </ol>
+
+      <h2>The profile</h2>
+
+      <p>Ali built her own profile, and she's happy with it. It codifies how she actually writes — distilled from her tweets, blog posts, and LinkedIn posts, then sharpened with specific rules the LLMs didn't quite catch. She did it for herself over a weekend. I get to read it.</p>
+
+      <p>A few rules from it, verbatim:</p>
+
+      <ul>
+        <li><em>Always put a comma after short opener phrases, even brief ones ("Last week,", "In 2020,", "After the call,", "For me,").</em></li>
+        <li><em>Write "25 minutes" / "5 things" / "3 founders," not "twenty-five minutes." Digits over spelled-out numbers, everywhere.</em></li>
+        <li><em>No hedging. Say "I think X is not good," not "I kinda think." State the take.</em></li>
+      </ul>
+
+      <h2>The log</h2>
+
+      <p>LLMs can make a decent draft. But the shape of it — lol — still gives off an AI smell, and I'd like to remove as much of that as I can. So I always give feedback on the drafts.</p>
+
+      <p>The log is a single append-only markdown file. Every time <code>/alify</code> rewrites something I gave it and I push back, the correction goes in: the context, what I said, the takeaway, whether it matches or contradicts the profile. The log is a memory layer, nothing else. Nothing gets rewritten in it. It just records what was written, what changed, and what was approved.</p>
+
+      <h2>The skill</h2>
+
+      <p>I don't change the voice profile. But I do update the skill, so the LLMs don't repeat mistakes and so the nuances get tracked. Emails have their own preferences. Social posts have their own references. Formal writing has its own. I can ask the skill what our defaults are for a given kind of email, and it has an inference layer — it reads my rough write-up, guesses what I'm actually trying to write, and produces a good-enough draft to push back on.</p>
+
+      <h2>Watching the voice profile</h2>
+
+      <p>The tool never edits Ali's profile. When the log accumulates 3 entries in a row that contradict a profile rule, the tool surfaces it in chat: <em>"Heads up — 3 entries in feedback_log now say you prefer X over Y, but the profile still says Y. Want to update?"</em></p>
+
+      <p>Then I screenshot it and send it to Ali. She decides.</p>
+
+      <p>This is the part that keeps the tool deferent to the source instead of the other way around. The profile is never wrong — it's just not finished. Ali wrote it over a weekend; a weekend doesn't catch every case. So the log isn't there to overrule the profile, it's there to find the rules the profile hasn't written down yet. Ali is the source. The robot is a mirror that, when it spots a pattern, asks her if she wants to add it.</p>
+
+      <h2>Drift</h2>
+
+      <p>People say LLMs drift, but a fresh model doesn't — it's the same weights every call. What actually drifts is the skill. I keep editing it, adding nuances, patching mistakes, and over enough edits a skill file accumulates cruft and contradicts itself. The expensive fix is to run two models against each other and do regression analysis on the confidence scores. The cheap fix is the one I built: the profile and the log are raw, append-only, untouched. They don't drift because nothing rewrites them. So when the skill starts producing drafts I don't like, I don't debug the skill — I regenerate it from scratch against the profile and the log. The skill is allowed to rot. The two files it's built from are not.</p>
+
+      <p>When a normal voice clone gets something wrong, you shrug and run it again. When <code>/alify</code> gets something wrong, I can open the files and find the cause — a rule, a missing correction, a gap in the skill. Most failures have an address. That's the difference between a voice clone you trust and one you don't: not how human it sounds, but whether you can find the bug.</p>
+
+      <p>So I built a robot to write like my boss. What I actually built was a list of every way I don't — written down, in order, where I can finally do something about it.</p>
+    </article>
+  </main>
+
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+    const stored = localStorage.getItem('theme');
+    const initial = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+    function setTheme(theme) {
+      document.body.setAttribute('data-theme', theme);
+      themeToggle.textContent = theme === 'dark' ? 'Light' : 'Dark';
+      localStorage.setItem('theme', theme);
+    }
+
+    setTheme(initial);
+
+    themeToggle.addEventListener('click', () => {
+      const current = document.body.getAttribute('data-theme');
+      setTheme(current === 'dark' ? 'light' : 'dark');
+    });
+  </script>
+</body>
+</html>
