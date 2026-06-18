@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{person.name}}</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg"/>
+  <meta name="google-site-verification" content="{{seo.googleSiteVerification}}"/>
+  <meta name="description" content="{{seo.metaDescription}}"/>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "{{person.name}}",
+    "alternateName": "{{person.alternateName}}",
+    "jobTitle": "{{person.jobTitle}}",
+    "description": "{{seo.schemaDescription}}",
+    "gender": "{{person.gender}}",
+    "homeLocation": {
+      "@type": "Place",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "{{location.locality}}",
+        "addressRegion": "{{location.region}}",
+        "addressCountry": "{{location.country}}"
+      }
+    },
+    "knowsAbout": {{json.knowsAbout}},
+    "worksFor": {
+      "@type": "Organization",
+      "name": "{{person.employer}}"
+    },
+    "url": "{{person.url}}",
+    "sameAs": {{json.sameAs}}
+  }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/topojson-client@3/dist/topojson-client.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F7F4F0;
+      --bg2: #EDE9E3;
+      --bg3: #E5E0D8;
+      --text: #1A1714;
+      --muted: #8C8378;
+      --accent: #C4836A;
+      --border: #DDD8D0;
+      --mono: 'Geist Mono', monospace;
+      --sans: 'Inter', sans-serif;
+    }
+
+    body[data-theme="dark"] {
+      --bg: #111012;
+      --bg2: #1A171D;
+      --bg3: #24202A;
+      --text: #FFD7E5;
+      --muted: #D9A6BC;
+      --accent: #FF8DB4;
+      --border: #3A2C35;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-weight: 300;
+      line-height: 1.6;
+      font-size: 15px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 999;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 0.4rem 0.75rem;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+    }
+    .theme-toggle:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    main { max-width: 680px; margin: 0 auto; padding: 5rem 2rem 6rem; }
+
+    section { padding: 4rem 0; }
+    section.bio { padding-top: 0; }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 1.75rem;
+    }
+
+    /* BIO PHOTO */
+    .bio-photo-wrap {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-bottom: 1.25rem;
+    }
+    .bio-photo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 8%;
+      transform: scale(1.18);
+    }
+
+    /* BIO */
+    .bio-name {
+      font-size: 1.1rem;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.85rem;
+      color: var(--text);
+    }
+
+    .bio-text {
+      font-size: 0.9rem;
+      color: var(--muted);
+      max-width: 500px;
+      line-height: 1.85;
+      margin-bottom: 1.4rem;
+    }
+
+    .bio-links { display: flex; align-items: center; gap: 1rem; }
+
+    .bio-links a {
+      color: var(--muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      transition: color 0.15s;
+    }
+    .bio-links a:hover { color: var(--accent); }
+
+    .bio-resume {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1px;
+      margin-left: 0.5rem;
+      transition: color 0.15s, border-color 0.15s;
+      display: inline !important;
+    }
+    .bio-resume:hover { color: var(--accent); border-color: var(--accent); }
+
+    .name-formal {
+      color: var(--muted);
+      font-weight: 300;
+      font-size: 0.9em;
+    }
+    .name-formal::before { content: '('; }
+    .name-formal::after  { content: ')'; }
+
+    .bio-text a {
+      color: var(--text);
+      text-decoration: underline;
+      text-decoration-color: var(--border);
+      text-underline-offset: 3px;
+      transition: text-decoration-color 0.15s;
+    }
+    .bio-text a:hover { text-decoration-color: var(--accent); }
+
+    /* NOW */
+    .now-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 2rem;
+      padding: 0.9rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .now-item:first-child { border-top: 1px solid var(--border); }
+
+    .now-item-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      min-width: 100px;
+      flex-shrink: 0;
+      padding-top: 0.15rem;
+    }
+
+    .now-item-content { display: flex; flex-direction: column; gap: 0.45rem; }
+    .now-item-content p { font-size: 0.85rem; color: var(--muted); line-height: 1.65; }
+    .now-item-content a { color: var(--muted); text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 3px; transition: color 0.15s, text-decoration-color 0.15s; }
+    .now-item-content a:hover { color: var(--accent); text-decoration-color: var(--accent); }
+
+    /* WEATHER */
+    .weather-widget {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.28rem 0.65rem;
+      width: fit-content;
+    }
+
+    .weather-temp { color: var(--text); font-weight: 400; }
+    .weather-sep { color: var(--border); }
+    .weather-loading { opacity: 0.5; }
+
+    /* WRITING */
+    .post-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 0.9rem 0;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      transition: opacity 0.15s;
+      gap: 1rem;
+    }
+    .post-item:first-child { border-top: 1px solid var(--border); }
+    .post-item:hover { opacity: 0.5; }
+    .post-title { font-size: 0.88rem; color: var(--text); font-weight: 300; }
+    .post-date { font-family: var(--mono); font-size: 0.67rem; color: var(--muted); white-space: nowrap; }
+    .writing-empty { font-size: 0.85rem; color: var(--muted); }
+
+    /* MAP */
+    .map-wrap {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      height: 380px;
+      background: var(--bg2);
+      position: relative;
+    }
+
+    .map-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
+    #leaflet-map {
+      width: 100%;
+      height: 100%;
+      background: #FAF8F5;
+    }
+
+    /* Keep Leaflet tile sizing immune to global resets. */
+    #leaflet-map .leaflet-container,
+    #leaflet-map .leaflet-pane,
+    #leaflet-map .leaflet-tile,
+    #leaflet-map .leaflet-marker-icon,
+    #leaflet-map .leaflet-marker-shadow {
+      box-sizing: content-box;
+    }
+
+    #leaflet-map .leaflet-tile {
+      max-width: none !important;
+      max-height: none !important;
+    }
+
+    /* PROJECTS */
+    .project-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 0.9rem 0;
+      border-bottom: 1px solid var(--border);
+      gap: 1rem;
+    }
+    .project-item:first-child { border-top: 1px solid var(--border); }
+    .project-info { display: flex; flex-direction: column; gap: 0.3rem; }
+    .project-name { font-size: 0.88rem; color: var(--text); font-weight: 300; }
+    .project-name a { color: inherit; text-decoration: none; }
+    .project-name a:hover { color: var(--accent); }
+    .project-desc { font-size: 0.78rem; color: var(--muted); }
+    .project-lang { font-family: var(--mono); font-size: 0.65rem; color: var(--muted); white-space: nowrap; }
+    .project-note { font-size: 0.78rem; color: var(--muted); margin-top: 1.25rem; font-style: italic; }
+
+    .map-note {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--muted);
+      margin-top: 0.75rem;
+      letter-spacing: 0.03em;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 0.67rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a { color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .footer-links a:hover { color: var(--text); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .bio > * { animation: fadeUp 0.5s ease both; }
+    .bio > *:nth-child(1) { animation-delay: 0.05s; }
+    .bio > *:nth-child(2) { animation-delay: 0.12s; }
+    .bio > *:nth-child(3) { animation-delay: 0.2s; }
+
+    @media (max-width: 600px) {
+      main { padding: 3rem 1.5rem 4rem; }
+      .map-wrap { height: 260px; }
+    }
+
+    /* SNAKE LAUNCHER (floating pill) */
+    .snake-launcher {
+      position: fixed;
+      right: 1rem;
+      bottom: 1rem;
+      z-index: 998;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 0.5rem 0.85rem;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: color 0.15s, border-color 0.15s, transform 0.15s;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .snake-launcher:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+    .snake-launcher .snake-pip {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 1px;
+      box-shadow: 8px 0 0 var(--accent), 4px 0 0 var(--accent);
+    }
+
+    /* SNAKE LAUNCHER (bio link) */
+    .bio-snake {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      background: none;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      padding: 0 0 1px 0;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .bio-snake:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* SNAKE MODAL */
+    .snake-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      backdrop-filter: blur(2px);
+    }
+    .snake-modal.open { display: flex; }
+
+    .snake-frame {
+      background: #15131A;
+      border: 1px solid #2A252F;
+      color: #fff;
+      border-radius: 12px;
+      padding: 1rem 1rem 1.1rem;
+      width: min(360px, 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+    }
+
+    .snake-rick {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+    }
+    .snake-rick.hidden { display: none; }
+    .snake-rick-head {
+      padding: 0.45rem 0.6rem;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #fff;
+      text-align: center;
+      background: #15131A;
+      border-bottom: 1px solid #2A252F;
+    }
+    .snake-rick-video {
+      flex: 1 1 auto;
+      min-height: 0;
+      position: relative;
+    }
+    .snake-rick-video iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+    .snake-rick-replay {
+      padding: 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fff;
+      background: #15131A;
+      border: none;
+      border-top: 1px solid #2A252F;
+      cursor: pointer;
+      width: 100%;
+      transition: color 0.15s;
+    }
+    .snake-rick-replay:hover { color: var(--accent); }
+
+    .snake-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+    .snake-bar .snake-title { color: #fff; font-weight: 500; }
+    .snake-bar .snake-close {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      line-height: 1;
+      padding: 0.15rem 0.35rem;
+      transition: color 0.15s;
+    }
+    .snake-bar .snake-close:hover { color: #fff; }
+
+    .snake-stage {
+      position: relative;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      aspect-ratio: 1 / 1;
+    }
+    .snake-stage canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      touch-action: none;
+    }
+
+    .snake-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      font-family: var(--mono);
+      text-align: center;
+      padding: 1rem;
+      cursor: pointer;
+    }
+    .snake-overlay.hidden { display: none; }
+    .snake-overlay .snake-headline {
+      font-size: 0.95rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+    .snake-overlay .snake-sub {
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+
+    .snake-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+    .snake-foot .snake-keys { color: #fff; opacity: 0.85; }
+  </style>
+</head>
+<body>
+<button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">Dark</button>
+
+<button type="button" class="snake-launcher" id="snake-launcher-fab" data-snake-open aria-label="Play snake">
+  <span class="snake-pip" aria-hidden="true"></span>
+  <span>play snake</span>
+</button>
+
+<div class="snake-modal" id="snake-modal" role="dialog" aria-modal="true" aria-label="Snake game">
+  <div class="snake-frame">
+    <div class="snake-bar">
+      <span class="snake-title">snake</span>
+      <span>score <span id="snake-score">0</span> · best <span id="snake-best">0</span></span>
+      <button type="button" class="snake-close" id="snake-close" aria-label="Close">✕</button>
+    </div>
+    <div class="snake-stage">
+      <canvas id="snake-canvas" width="320" height="320"></canvas>
+      <div class="snake-rick hidden" id="snake-rick">
+        <div class="snake-rick-head">too bad</div>
+        <div class="snake-rick-video" id="snake-rick-video"></div>
+        <button type="button" class="snake-rick-replay" id="snake-rick-replay">tap to play again</button>
+      </div>
+      <div class="snake-overlay" id="snake-overlay">
+        <div class="snake-headline" id="snake-headline">snake</div>
+        <div class="snake-sub" id="snake-sub">tap or press space to start</div>
+      </div>
+    </div>
+    <div class="snake-foot">
+      <span class="snake-keys">WASD / arrows</span>
+      <span>tap a side on mobile</span>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- BIO -->
+  <section class="bio">
+    <div class="bio-photo-wrap">
+      <img src="./profile.png" alt="{{person.name}}" class="bio-photo"/>
+    </div>
+    <p class="bio-name">Hi, I'm <span class="name-formal">{{person.formalName}}</span> {{person.firstName}} 👋</p>
+    <p class="bio-text">
+      Currently Chief of Staff at Outset Capital, where I spearhead fund operations — managing deal flow, LP relations, and the many small things that keep a fund running. I've helped produce events like <a href="https://www.youtube.com/watch?v=jksGQhMtXjo&amp;list=PLhiu4AFpuCpqDwjWx-DvU6gpbAt9Mzbxw" target="_blank" rel="noopener">Thursday Nights in AI</a>, <a href="https://www.youtube.com/watch?v=FWqyqBlp8ng&amp;list=PLhiu4AFpuCprU4slou242mX98t_V8KxBc" target="_blank" rel="noopener">Portfolio Showcase</a>, and various investor dinners.
+    </p>
+    <p class="bio-text">
+      Before Outset, I ran operations at a real estate firm, overseeing the full business cycle from sourcing to closing. Before that, I was an IQ/OQ/PQ validation consultant for biopharma companies in the South San Francisco area. Chemical engineer by training — graduated at 19.
+    </p>
+    <p class="bio-text">
+      Outside work, you'll find me travelling, reading, gaming, or spending time with my cats and dog.
+    </p>
+    <div class="bio-links">
+      <a href="{{links.linkedin}}" title="LinkedIn" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+      </a>
+      <a href="{{links.github}}" title="GitHub" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+      </a>
+      <a href="mailto:{{person.email}}" title="Email">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+      </a>
+      <a href="{{links.x}}" title="X (Twitter)" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </a>
+      <a href="{{links.instagram}}" title="Instagram" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+      </a>
+      <a href="{{person.resumePath}}" class="bio-resume" target="_blank" rel="noopener">resume ↗</a>
+      <button type="button" class="bio-snake" id="snake-launcher" data-snake-open aria-label="Play snake">play snake ↗</button>
+    </div>
+  </section>
+
+  <!-- NOW -->
+  <section id="now">
+    <p class="section-label">Now</p>
+
+    <div class="now-item">
+      <span class="now-item-label">working on</span>
+      <div class="now-item-content">
+        <p>CRM and automation infrastructure at Outset Capital.</p>
+      </div>
+    </div>
+
+    <div class="now-item">
+      <span class="now-item-label">currently in</span>
+      <div class="now-item-content">
+        <p>{{location.cityState}}.</p>
+        <div class="weather-widget" id="weather">
+          <span class="weather-loading">fetching weather...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="now-item">
+      <span class="now-item-label">next trip</span>
+      <div class="now-item-content">
+        <p>London.</p>
+      </div>
+    </div>
+
+    <div class="now-item">
+      <span class="now-item-label">reading</span>
+      <div class="now-item-content">
+        <p><a href="https://www.amazon.com/Sunrise-Reaping-Hunger-Games-Novel/dp/1546171460" target="_blank" rel="noopener">Sunrise on the Reaping</a>.</p>
+      </div>
+    </div>
+
+    <div class="now-item">
+      <span class="now-item-label">playing</span>
+      <div class="now-item-content">
+        <p><a href="https://www.alanwake.com/" target="_blank" rel="noopener">Alan Wake II</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WRITING -->
+  <section id="writing">
+    <p class="section-label">Writing</p>
+{{html.indexWriting}}
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <p class="section-label">Projects</p>
+{{html.indexProjects}}
+    <p class="project-note">{{content.projectNote}}</p>
+  </section>
+
+  <!-- TRAVEL + MAP -->
+  <section id="travel">
+    <p class="section-label">Travel</p>
+    <div class="map-wrap">
+      <div id="leaflet-map"></div>
+    </div>
+    <p class="map-note">* places I've reviewed on Google Maps</p>
+  </section>
+
+  <footer>
+    <span><img src="./favicon.svg" alt="" style="width:14px;height:14px;vertical-align:middle;margin-right:0.4rem;image-rendering:pixelated">mae.xyz</span>
+    <div class="footer-links">
+      <a href="{{links.linkedin}}" target="_blank" rel="noopener">linkedin</a>
+      <a href="{{links.github}}" target="_blank" rel="noopener">github</a>
+      <a href="{{links.x}}" target="_blank" rel="noopener">x</a>
+      <a href="mailto:{{person.email}}">email</a>
+    </div>
+  </footer>
+
+</main>
+
+<script>
+  const themeToggle = document.getElementById('theme-toggle');
+  const savedTheme = localStorage.getItem('theme');
+  const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  let activeTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+
+  function setTheme(theme) {
+    activeTheme = theme;
+    document.body.setAttribute('data-theme', theme);
+    themeToggle.textContent = theme === 'dark' ? 'Light' : 'Dark';
+    localStorage.setItem('theme', theme);
+    applyMapTheme(theme);
+  }
+
+  themeToggle.addEventListener('click', () => {
+    setTheme(activeTheme === 'dark' ? 'light' : 'dark');
+  });
+
+  function parseWttrTimeToday(timeStr) {
+    if (!timeStr) return null;
+    const now = new Date();
+    const match = timeStr.trim().match(/^(\d{1,2}):(\d{2})\s*([AP]M)$/i);
+    if (!match) return null;
+    let hour = Number(match[1]) % 12;
+    const minute = Number(match[2]);
+    const ampm = match[3].toUpperCase();
+    if (ampm === 'PM') hour += 12;
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute, 0, 0);
+  }
+
+  function setThemeByChicagoSunTimes(sunriseStr, sunsetStr) {
+    const sunrise = parseWttrTimeToday(sunriseStr);
+    const sunset = parseWttrTimeToday(sunsetStr);
+    if (!sunrise || !sunset) return false;
+
+    const now = new Date();
+    const isDark = now < sunrise || now >= sunset;
+    setTheme(isDark ? 'dark' : 'light');
+    return true;
+  }
+
+  // ── REVIEWS MAP ──
+  // Use full Web Mercator latitude range to avoid clipping artifacts
+  // that can appear as horizontal "misaligned" bands.
+  const WORLD_BOUNDS = [[-85, -180], [85, 180]];
+  const map = L.map('leaflet-map', {
+    preferCanvas: true,
+    zoomControl: false,
+    scrollWheelZoom: false,
+    minZoom: 1,
+    maxZoom: 8,
+    worldCopyJump: false,
+  });
+  map.fitBounds(WORLD_BOUNDS, { animate: false });
+
+  function fitMap() {
+    map.invalidateSize();
+    map.fitBounds(WORLD_BOUNDS, { animate: false });
+  }
+
+  function fitMapSoon() {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(fitMap);
+    });
+  }
+
+  new ResizeObserver(fitMapSoon).observe(document.querySelector('.map-wrap'));
+  window.addEventListener('load', fitMapSoon);
+  window.addEventListener('resize', fitMapSoon);
+  window.addEventListener('orientationchange', fitMapSoon);
+
+  // Labels-only tile layer rendered above everything
+  map.createPane('labels');
+  map.getPane('labels').style.zIndex = 650;
+  map.getPane('labels').style.pointerEvents = 'none';
+
+  let baseLayer;
+  let labelsLayer;
+
+  function applyMapTheme(theme) {
+    if (baseLayer) map.removeLayer(baseLayer);
+    if (labelsLayer) map.removeLayer(labelsLayer);
+
+    const isDark = theme === 'dark';
+    baseLayer = L.tileLayer(
+      `https://{s}.basemaps.cartocdn.com/${isDark ? 'dark_nolabels' : 'light_nolabels'}/{z}/{x}/{y}{r}.png`,
+      {
+        attribution: '© OpenStreetMap © CARTO',
+        maxZoom: 19,
+        noWrap: true
+      }
+    ).addTo(map);
+
+    labelsLayer = L.tileLayer(
+      `https://{s}.basemaps.cartocdn.com/${isDark ? 'dark_only_labels' : 'light_only_labels'}/{z}/{x}/{y}{r}.png`,
+      {
+        attribution: '© OpenStreetMap © CARTO',
+        maxZoom: 19,
+        noWrap: true,
+        pane: 'labels'
+      }
+    ).addTo(map);
+  }
+
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+  const dot = L.divIcon({
+    className: '',
+    html: '<div style="width:8px;height:8px;background:#C4836A;border-radius:50%;border:1.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,0.25)"></div>',
+    iconSize: [8, 8],
+    iconAnchor: [4, 4]
+  });
+
+  fetch('./reviews.json')
+    .then(r => r.json())
+    .then(data => {
+      data.features.forEach(f => {
+        const [lng, lat] = f.geometry.coordinates;
+        const { name, address, rating, url } = f.properties;
+        const stars = rating ? '★'.repeat(rating) + '☆'.repeat(5 - rating) : '';
+        const mapsLink = url ? `<br><a href="${url}" target="_blank" rel="noopener" style="font-size:0.75rem">view on maps ↗</a>` : '';
+        L.marker([lat, lng], { icon: dot })
+          .bindPopup(`<strong>${name}</strong>${stars ? `<br><span style="color:#C4836A">${stars}</span>` : ''}<br><small>${address}</small>${mapsLink}`)
+          .addTo(map);
+      });
+      fitMapSoon();
+    });
+
+  // ── GITHUB PROJECTS ──
+  fetch('https://api.github.com/users/{{accounts.githubUser}}/repos?sort=updated&per_page=20')
+    .then(r => r.json())
+    .then(repos => {
+      const list = document.getElementById('projects-list');
+      const filtered = repos.filter(r => !r.fork && r.name !== 'haseona21.github.io');
+      if (!filtered.length) {
+        list.innerHTML = '<p class="project-desc" style="padding:0.9rem 0">More coming soon.</p>';
+        return;
+      }
+      filtered.forEach(r => {
+        list.innerHTML += `
+          <div class="project-item">
+            <div class="project-info">
+              <span class="project-name"><a href="${r.html_url}" target="_blank" rel="noopener">${r.name.replace(/-/g,' ')}</a></span>
+              ${r.description ? `<span class="project-desc">${r.description}</span>` : ''}
+            </div>
+            ${r.language ? `<span class="project-lang">${r.language}</span>` : ''}
+          </div>`;
+      });
+    });
+
+  async function fetchWeather() {
+    const el = document.getElementById('weather');
+    try {
+      const res  = await fetch('https://wttr.in/{{location.locality}}?format=j1');
+      const data = await res.json();
+      const cur  = data.current_condition[0];
+      const temp = cur.temp_F;
+      const desc = cur.weatherDesc[0].value;
+      const astronomy = data.weather?.[0]?.astronomy?.[0];
+      setThemeByChicagoSunTimes(astronomy?.sunrise, astronomy?.sunset);
+      el.innerHTML = `
+        <span class="weather-temp">${temp}°F</span>
+        <span class="weather-sep">·</span>
+        <span>${desc} · {{location.locality}}</span>
+      `;
+    } catch {
+      el.innerHTML = `<span class="weather-loading">weather unavailable</span>`;
+    }
+  }
+  fetchWeather();
+
+  setTheme(activeTheme);
+
+  // ── SNAKE ──
+  (() => {
+    const launchers = document.querySelectorAll('[data-snake-open]');
+    const modal = document.getElementById('snake-modal');
+    const closeBtn = document.getElementById('snake-close');
+    const canvas = document.getElementById('snake-canvas');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('snake-score');
+    const bestEl = document.getElementById('snake-best');
+    const overlay = document.getElementById('snake-overlay');
+    const headline = document.getElementById('snake-headline');
+    const sub = document.getElementById('snake-sub');
+
+    const GRID = 16;
+    const CELL = canvas.width / GRID;
+    const TICK_START = 200;
+    const TICK_FLOOR = 60;
+    const TICK_STEP = 8;
+    const RICKROLL_THRESHOLD = 5;
+
+    let snake, dir, nextDir, food, score, best, running, alive, awaitingRickroll, lastTick, rafId;
+    const rickEl = document.getElementById('snake-rick');
+    const rickVideo = document.getElementById('snake-rick-video');
+    const rickReplay = document.getElementById('snake-rick-replay');
+    const RICK_EMBED = 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&list=RDdQw4w9WgXcQ';
+
+    function tickMs() {
+      return Math.max(TICK_FLOOR, TICK_START - score * TICK_STEP);
+    }
+
+    const catImg = new Image();
+    catImg.src = './favicon.svg';
+    catImg.onload = () => { if (snake) draw(); };
+    ctx.imageSmoothingEnabled = false;
+
+    // Crying cat: same sprite + sad-eye masks + blue tear streaks
+    const cryCatSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="1" y="1" width="2" height="1" fill="#F4922A"/><rect x="1" y="2" width="3" height="1" fill="#F4922A"/><rect x="12" y="1" width="2" height="1" fill="#F4922A"/><rect x="11" y="2" width="3" height="1" fill="#F4922A"/><rect x="1" y="3" width="13" height="1" fill="#F4922A"/><rect x="0" y="4" width="15" height="2" fill="#F4922A"/><rect x="5" y="3" width="1" height="3" fill="#C96B1A"/><rect x="7" y="3" width="1" height="3" fill="#C96B1A"/><rect x="9" y="3" width="1" height="3" fill="#C96B1A"/><rect x="0" y="6" width="4" height="2" fill="#F4922A"/><rect x="6" y="6" width="4" height="2" fill="#F4922A"/><rect x="12" y="6" width="3" height="2" fill="#F4922A"/><rect x="4" y="6" width="2" height="2" fill="#2D1F14"/><rect x="10" y="6" width="2" height="2" fill="#2D1F14"/><rect x="0" y="8" width="15" height="1" fill="#F4922A"/><rect x="0" y="9" width="7" height="1" fill="#F4922A"/><rect x="8" y="9" width="7" height="1" fill="#F4922A"/><rect x="0" y="10" width="15" height="1" fill="#F4922A"/><rect x="7" y="9" width="1" height="1" fill="#E8617A"/><rect x="1" y="11" width="13" height="1" fill="#F4922A"/><rect x="2" y="12" width="11" height="1" fill="#F4922A"/><rect x="4" y="6" width="2" height="1" fill="#F4922A"/><rect x="10" y="6" width="2" height="1" fill="#F4922A"/><rect x="4" y="8" width="1" height="3" fill="#5FB0D9"/><rect x="11" y="8" width="1" height="3" fill="#5FB0D9"/></svg>`;
+    const cryCatImg = new Image();
+    cryCatImg.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(cryCatSvg);
+    cryCatImg.onload = () => { if (snake) draw(); };
+
+    best = Number(localStorage.getItem('snake-best') || 0);
+    bestEl.textContent = best;
+
+    function reset() {
+      snake = [{x: 8, y: 8}, {x: 7, y: 8}, {x: 6, y: 8}];
+      dir = {x: 1, y: 0};
+      nextDir = dir;
+      score = 0;
+      scoreEl.textContent = score;
+      placeFood();
+      alive = true;
+      draw();
+    }
+
+    function placeFood() {
+      while (true) {
+        const f = {x: Math.floor(Math.random() * GRID), y: Math.floor(Math.random() * GRID)};
+        if (!snake.some(s => s.x === f.x && s.y === f.y)) { food = f; return; }
+      }
+    }
+
+    function step() {
+      dir = nextDir;
+      const head = {
+        x: (snake[0].x + dir.x + GRID) % GRID,
+        y: (snake[0].y + dir.y + GRID) % GRID
+      };
+      if (snake.some(s => s.x === head.x && s.y === head.y)) return gameOver();
+      snake.unshift(head);
+      if (head.x === food.x && head.y === food.y) {
+        score += 1;
+        scoreEl.textContent = score;
+        if (score > best) {
+          best = score;
+          bestEl.textContent = best;
+          localStorage.setItem('snake-best', best);
+        }
+        placeFood();
+      } else {
+        snake.pop();
+      }
+      draw();
+    }
+
+    function color(name) {
+      return getComputedStyle(document.body).getPropertyValue(name).trim();
+    }
+
+    function draw() {
+      const bg = color('--bg3');
+      const accent = color('--accent');
+      const text = color('--text');
+      const border = color('--border');
+
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // faint grid for Nokia LCD vibe
+      ctx.strokeStyle = border;
+      ctx.globalAlpha = 0.25;
+      ctx.lineWidth = 1;
+      for (let i = 1; i < GRID; i++) {
+        ctx.beginPath();
+        ctx.moveTo(i * CELL, 0);
+        ctx.lineTo(i * CELL, canvas.height);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, i * CELL);
+        ctx.lineTo(canvas.width, i * CELL);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+
+      // food: the pixel cat (cries on game over)
+      const sprite = (!alive && cryCatImg.complete && cryCatImg.naturalWidth) ? cryCatImg : catImg;
+      if (sprite.complete && sprite.naturalWidth) {
+        const pad = 1;
+        ctx.drawImage(sprite, food.x * CELL + pad, food.y * CELL + pad, CELL - pad * 2, CELL - pad * 2);
+      } else {
+        drawCell(food.x, food.y, accent, accent);
+      }
+
+      // snake
+      snake.forEach((seg, i) => {
+        drawCell(seg.x, seg.y, i === 0 ? accent : text, bg);
+      });
+    }
+
+    function drawCell(x, y, fill, inner) {
+      const pad = 2;
+      const innerPad = 5;
+      ctx.fillStyle = fill;
+      ctx.fillRect(x * CELL + pad, y * CELL + pad, CELL - pad * 2, CELL - pad * 2);
+      ctx.fillStyle = inner;
+      ctx.fillRect(x * CELL + innerPad, y * CELL + innerPad, CELL - innerPad * 2, CELL - innerPad * 2);
+    }
+
+    function loop(ts) {
+      if (!running) return;
+      if (!lastTick) lastTick = ts;
+      if (ts - lastTick >= tickMs()) {
+        lastTick = ts;
+        if (alive) step();
+      }
+      rafId = requestAnimationFrame(loop);
+    }
+
+    function start() {
+      if (!alive) reset();
+      overlay.classList.add('hidden');
+      running = true;
+      lastTick = 0;
+      rafId = requestAnimationFrame(loop);
+    }
+
+    function stop() {
+      running = false;
+      if (rafId) cancelAnimationFrame(rafId);
+    }
+
+    function gameOver() {
+      alive = false;
+      stop();
+      draw();
+      headline.textContent = 'game over';
+      if (score < RICKROLL_THRESHOLD) {
+        awaitingRickroll = true;
+        sub.textContent = `score ${score} · tap to try again`;
+      } else {
+        sub.textContent = `score ${score} · tap to play again`;
+      }
+      overlay.classList.remove('hidden');
+    }
+
+    function showRickroll() {
+      awaitingRickroll = false;
+      rickVideo.innerHTML = `<iframe src="${RICK_EMBED}" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+      rickEl.classList.remove('hidden');
+      overlay.classList.add('hidden');
+    }
+
+    function clearRickroll() {
+      rickVideo.innerHTML = '';
+      rickEl.classList.add('hidden');
+    }
+
+    rickReplay.addEventListener('click', () => {
+      clearRickroll();
+      reset();
+      start();
+    });
+
+    function open() {
+      modal.classList.add('open');
+      clearRickroll();
+      reset();
+      awaitingRickroll = false;
+      headline.textContent = 'snake';
+      sub.textContent = 'tap or press space to start';
+      overlay.classList.remove('hidden');
+    }
+
+    function close() {
+      modal.classList.remove('open');
+      stop();
+      clearRickroll();
+    }
+
+
+    function setDir(nx, ny) {
+      // prevent 180° reversal
+      if (snake.length > 1 && nx === -dir.x && ny === -dir.y) return;
+      nextDir = {x: nx, y: ny};
+    }
+
+    launchers.forEach(el => el.addEventListener('click', open));
+    closeBtn.addEventListener('click', close);
+    modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+
+    overlay.addEventListener('click', () => {
+      if (awaitingRickroll) { showRickroll(); return; }
+      start();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!modal.classList.contains('open')) return;
+      const k = e.key.toLowerCase();
+      if (k === 'escape') { close(); return; }
+      if (k === ' ' || k === 'enter') {
+        if (!running || !alive) {
+          e.preventDefault();
+          if (awaitingRickroll) showRickroll(); else start();
+        }
+        return;
+      }
+      if (k === 'w' || k === 'arrowup') { setDir(0, -1); e.preventDefault(); }
+      else if (k === 's' || k === 'arrowdown') { setDir(0, 1); e.preventDefault(); }
+      else if (k === 'a' || k === 'arrowleft') { setDir(-1, 0); e.preventDefault(); }
+      else if (k === 'd' || k === 'arrowright') { setDir(1, 0); e.preventDefault(); }
+    });
+
+    // Touch: tap one of four triangular zones (split by diagonals through canvas center)
+    canvas.addEventListener('pointerdown', (e) => {
+      if (awaitingRickroll) { showRickroll(); return; }
+      if (!running || !alive) { start(); return; }
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;   // 0..1
+      const y = (e.clientY - rect.top) / rect.height;   // 0..1
+      const dx = x - 0.5;
+      const dy = y - 0.5;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        setDir(dx > 0 ? 1 : -1, 0);
+      } else {
+        setDir(0, dy > 0 ? 1 : -1);
+      }
+    });
+
+    // Redraw on theme change so colors stay in sync
+    const themeObserver = new MutationObserver(() => { if (snake) draw(); });
+    themeObserver.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+  })();
+</script>
+
+</body>
+</html>

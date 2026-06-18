@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{post.title}} — {{person.name}}</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <meta name="description" content="{{post.metaDescription}}"/>
+  <meta name="author" content="{{person.name}}"/>
+  <meta property="article:published_time" content="{{post.published}}"/>
+  <meta property="og:title" content="{{post.ogTitle}}"/>
+  <meta property="og:description" content="{{post.ogDescription}}"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="{{post.ogUrl}}"/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F7F4F0;
+      --bg2: #EDE9E3;
+      --bg3: #E5E0D8;
+      --text: #1A1714;
+      --muted: #8C8378;
+      --accent: #C4836A;
+      --border: #DDD8D0;
+      --mono: 'Geist Mono', monospace;
+      --sans: 'Inter', sans-serif;
+    }
+
+    body[data-theme="dark"] {
+      --bg: #111012;
+      --bg2: #1A171D;
+      --bg3: #24202A;
+      --text: #FFD7E5;
+      --muted: #D9A6BC;
+      --accent: #FF8DB4;
+      --border: #3A2C35;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-weight: 300;
+      line-height: 1.65;
+      font-size: 15.5px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 999;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 0.4rem 0.75rem;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+    }
+    .theme-toggle:hover { color: var(--accent); border-color: var(--accent); }
+
+    main { max-width: 680px; margin: 0 auto; padding: 5rem 2rem 6rem; }
+
+    .back {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      margin-bottom: 3rem;
+      transition: color 0.15s;
+    }
+    .back:hover { color: var(--accent); }
+
+    .post-meta {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero-img {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin: 2rem 0 3rem;
+      border-radius: 6px;
+    }
+
+    h1 {
+      font-size: 1.85rem;
+      font-weight: 500;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.6rem;
+    }
+
+    .dek {
+      font-size: 1.05rem;
+      color: var(--muted);
+      font-weight: 300;
+      line-height: 1.55;
+      margin-bottom: 3rem;
+    }
+
+    article p { margin-bottom: 1.2rem; }
+
+    article h2 {
+      font-size: 1.15rem;
+      font-weight: 500;
+      margin-top: 2.75rem;
+      margin-bottom: 1rem;
+      letter-spacing: -0.005em;
+    }
+
+    article h3 {
+      font-size: 0.95rem;
+      font-weight: 500;
+      margin-top: 1.75rem;
+      margin-bottom: 0.6rem;
+      color: var(--text);
+    }
+
+    article ul, article ol {
+      margin: 0 0 1.2rem 1.25rem;
+      padding-left: 0.5rem;
+    }
+    article li { margin-bottom: 0.4rem; }
+
+    article a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.15s;
+    }
+    article a:hover { border-bottom-color: var(--accent); }
+
+    article code {
+      font-family: var(--mono);
+      font-size: 0.85em;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.05em 0.35em;
+    }
+
+    article pre {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.85rem 1rem;
+      overflow-x: auto;
+      margin: 1.2rem 0;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      line-height: 1.55;
+    }
+    article pre code {
+      background: transparent;
+      border: none;
+      padding: 0;
+      font-size: inherit;
+    }
+
+    article blockquote {
+      margin: 1.25rem 0;
+      padding-left: 1rem;
+      border-left: 2px solid var(--accent);
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .footer-note {
+      margin-top: 4rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .footer-note a { color: var(--accent); text-decoration: none; }
+    .footer-note a:hover { border-bottom: 1px solid var(--accent); }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">Dark</button>
+
+  <main>
+    <a class="back" href="../">← back</a>
+
+    <p class="post-meta">{{post.dateDisplay}} · {{post.readTime}}</p>
+    <h1>{{post.title}}</h1>
+
+{{post.bodyHtml}}
+  </main>
+
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+    const stored = localStorage.getItem('theme');
+    const initial = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+    function setTheme(theme) {
+      document.body.setAttribute('data-theme', theme);
+      themeToggle.textContent = theme === 'dark' ? 'Light' : 'Dark';
+      localStorage.setItem('theme', theme);
+    }
+
+    setTheme(initial);
+
+    themeToggle.addEventListener('click', () => {
+      const current = document.body.getAttribute('data-theme');
+      setTheme(current === 'dark' ? 'light' : 'dark');
+    });
+  </script>
+</body>
+</html>

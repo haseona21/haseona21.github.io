@@ -1,0 +1,112 @@
+{
+  "person": {
+    "name": "Christine Mae Tse",
+    "alternateName": "Mae Tse",
+    "formalName": "Christine",
+    "firstName": "Mae",
+    "jobTitle": "Chief of Staff",
+    "gender": "Female",
+    "employer": "Outset Capital",
+    "email": "hello@maetse.com",
+    "url": "https://maetse.com",
+    "resumeFile": "Christine_Tse_Resume.pdf"
+  },
+  "location": {
+    "locality": "Chicago",
+    "region": "IL",
+    "country": "US",
+    "cityState": "Chicago, IL"
+  },
+  "links": {
+    "linkedin": "https://www.linkedin.com/in/cmbberbon/",
+    "github": "https://github.com/haseona21",
+    "x": "https://x.com/amaetseing",
+    "instagram": "https://www.instagram.com/potatoesandflowers/"
+  },
+  "accounts": {
+    "githubUser": "haseona21"
+  },
+  "seo": {
+    "googleSiteVerification": "QP4GVfhoE4wP3yOm3Y7c-WR0esgsqR8__qVlMY9DH7c",
+    "metaDescription": "Christine Mae Tse — Chief of Staff at Outset Capital, based in Chicago. An immigrant woman in tech and venture capital. Fund operations, event production, and deal flow.",
+    "schemaDescription": "Chief of Staff at Outset Capital and an immigrant woman in tech and venture capital, based in Chicago. Leads fund operations, deal flow, LP relations, event production, and CRM/workflow automation.",
+    "ogBase": "https://haseona21.github.io"
+  },
+  "knowsAbout": [
+    "Chief of Staff",
+    "Fund operations",
+    "Venture capital operations",
+    "Deal flow management",
+    "LP relations",
+    "Event production",
+    "CRM and workflow automation",
+    "Women in tech",
+    "Immigrant women in tech"
+  ],
+  "content": {
+    "projectNote": "Still learning — these are tools I built to solve real problems."
+  },
+  "projects": [
+    {
+      "name": "podcast-shorts-pipeline",
+      "url": "https://github.com/haseona21/podcast-shorts-pipeline",
+      "lang": "Python",
+      "desc": "Open-source pipeline that turns a podcast draft-shorts doc into captioned vertical shorts — auto-cuts segments, transcribes, and renders single-pane or stacked layouts with karaoke captions"
+    },
+    {
+      "name": "attio-fathom-sync",
+      "lang": "TypeScript",
+      "desc": "Syncs call recordings, transcripts, and notes into CRM, auto-tagging contacts and updating deal stages after every meeting"
+    },
+    {
+      "name": "mixmax-extension",
+      "lang": "JavaScript",
+      "desc": "Email-sending extension that surfaces at a LinkedIn profile to help draft outreach"
+    },
+    {
+      "name": "pipeline-triage",
+      "lang": "Python",
+      "desc": "Automatically adds inbound contacts to CRM pipeline and sorts them by stage"
+    },
+    {
+      "name": "portfolio-dashboard",
+      "lang": "Python",
+      "desc": "AI-powered dashboard tracking fund metrics across portfolio companies"
+    },
+    {
+      "name": "monitor",
+      "lang": "Python",
+      "desc": "Monitors trending repos and product launches for deal flow signals"
+    },
+    {
+      "name": "preposition-trainer",
+      "url": "https://github.com/haseona21/preposition-trainer",
+      "lang": "HTML",
+      "desc": "Web app for practicing English preposition usage"
+    }
+  ],
+  "writing": [
+    {
+      "slug": "alify-voice-clone",
+      "title": "I built a robot to write like my boss",
+      "listDate": "May 2026",
+      "dateDisplay": "May 25, 2026",
+      "published": "2026-05-25",
+      "readTime": "~4 min read",
+      "metaDescription": "Notes on /alify — a Claude skill that rewrites my drafts in my boss's voice, built on a hand-written voice profile and an append-only correction log.",
+      "ogDescription": "Notes on /alify — a Claude skill that rewrites my drafts in my boss's voice.",
+      "llmsDescription": "Notes on /alify — a Claude skill that rewrites drafts in a boss's voice, built on a hand-written voice profile and an append-only correction log."
+    },
+    {
+      "slug": "event-driven-vc-ops",
+      "title": "Building CRM glue that doesn't fall over",
+      "listDate": "May 2026",
+      "dateDisplay": "May 5, 2026",
+      "published": "2026-05-05",
+      "readTime": "~7 min read",
+      "metaDescription": "Notes from building an event-driven daemon for a small VC fund's CRM ops — workflows, actions, an AI triage layer, and the failure modes that shaped the design.",
+      "ogDescription": "Notes from building an event-driven daemon for a small VC fund's CRM ops.",
+      "llmsDescription": "Notes from building an event-driven daemon for a small VC fund's CRM ops — workflows, actions, an AI triage layer, and the failure modes that shaped the design."
+    }
+  ]
+}

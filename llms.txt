@@ -23,12 +23,13 @@ Christine Mae Tse is Chief of Staff at Outset Capital, where she spearheads fund
 
 ## Projects (operations & automation tooling)
 
-- **attio-fathom-sync** (TypeScript): Syncs call recordings, transcripts, and notes into the CRM, auto-tagging contacts and updating deal stages after every meeting.
+- **podcast-shorts-pipeline** (Python): Open-source pipeline that turns a podcast draft-shorts doc into captioned vertical shorts — auto-cuts segments, transcribes, and renders single-pane or stacked layouts with karaoke captions.
+- **attio-fathom-sync** (TypeScript): Syncs call recordings, transcripts, and notes into CRM, auto-tagging contacts and updating deal stages after every meeting.
 - **mixmax-extension** (JavaScript): Email-sending extension that surfaces at a LinkedIn profile to help draft outreach.
-- **pipeline-triage** (Python): Automatically adds inbound contacts to the CRM pipeline and sorts them by stage.
+- **pipeline-triage** (Python): Automatically adds inbound contacts to CRM pipeline and sorts them by stage.
 - **portfolio-dashboard** (Python): AI-powered dashboard tracking fund metrics across portfolio companies.
 - **monitor** (Python): Monitors trending repos and product launches for deal flow signals.
-- **podcast-toolkit** (Python): Post-production toolkit for a weekly AI podcast — automates clip scripts, short-form edits, and publishing.
+- **preposition-trainer** (HTML): Web app for practicing English preposition usage.
 
 ## Writing
 

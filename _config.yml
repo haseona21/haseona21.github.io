@@ -1,0 +1,15 @@
+# GitHub Pages (Jekyll) config.
+# These are build sources/tooling — keep them in the repo but DO NOT publish
+# them to the live site. The published site is only the generated output and
+# static assets.
+exclude:
+  - src
+  - data
+  - build.js
+  - package.json
+  - package-lock.json
+  - node_modules
+  - README.md
+  - CLAUDE.md
+  - .githooks
+  - .github

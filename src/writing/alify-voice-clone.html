@@ -1,0 +1,57 @@
+    <article>
+      <p>I work at Outset Capital. Our GP, Ali Rohde (<a href="https://alibrohde.com/blog" target="_blank" rel="noopener">check out her blog here</a>!), is a stellar writer. I am also a writer, in the way that everyone with a job is a writer — emails, notes, the occasional LinkedIn post I delete before publishing. I'd like to have that verbose writing that can tell a story. Instead mine comes out sounding like a slightly anxious LLM trying to make payroll.</p>
+
+      <p>So I built a Claude skill. I call it <code>/alify</code>.</p>
+
+      <p>The robot reads a file Ali wrote about her own voice — a plain markdown file at <code>voice/ali_voice_profile.md</code> with rules like <em>Chicago intro-phrase comma, always</em> and <em>digits over spelled-out numbers, everywhere</em> and <em>no hedging, state the take</em>. Then it rewrites whatever I give it.</p>
+
+      <p>This is not training. The robot did not "absorb Ali's style." The robot is reading a file and following the rules in it.</p>
+
+      <p>Here's what most AI voice-cloning content sounds like: feed a model 10,000 of your tweets, let it absorb your style, see what comes out. The output is vibes-adjacent. It sounds like a smoothie of you and the model. You can't tell what the model learned versus what it made up, and when the output is wrong, you have no idea where to fix it.</p>
+
+      <p>Here's what <code>/alify</code> looks like instead:</p>
+
+      <ol>
+        <li>A hand-written voice profile. Ali wrote it. Specific rules, surface-by-surface — email register vs X register vs LP-facing work. Boring, manual, slow.</li>
+        <li>An append-only log of every time I push back on a rewrite. That one I wrote. The corrections live in <code>feedback_log.md</code>.</li>
+        <li>The tool reads both before it touches anything.</li>
+      </ol>
+
+      <h2>The profile</h2>
+
+      <p>Ali built her own profile, and she's happy with it. It codifies how she actually writes — distilled from her tweets, blog posts, and LinkedIn posts, then sharpened with specific rules the LLMs didn't quite catch. She did it for herself over a weekend. I get to read it.</p>
+
+      <p>A few rules from it, verbatim:</p>
+
+      <ul>
+        <li><em>Always put a comma after short opener phrases, even brief ones ("Last week,", "In 2020,", "After the call,", "For me,").</em></li>
+        <li><em>Write "25 minutes" / "5 things" / "3 founders," not "twenty-five minutes." Digits over spelled-out numbers, everywhere.</em></li>
+        <li><em>No hedging. Say "I think X is not good," not "I kinda think." State the take.</em></li>
+      </ul>
+
+      <h2>The log</h2>
+
+      <p>LLMs can make a decent draft. But the shape of it — lol — still gives off an AI smell, and I'd like to remove as much of that as I can. So I always give feedback on the drafts.</p>
+
+      <p>The log is a single append-only markdown file. Every time <code>/alify</code> rewrites something I gave it and I push back, the correction goes in: the context, what I said, the takeaway, whether it matches or contradicts the profile. The log is a memory layer, nothing else. Nothing gets rewritten in it. It just records what was written, what changed, and what was approved.</p>
+
+      <h2>The skill</h2>
+
+      <p>I don't change the voice profile. But I do update the skill, so the LLMs don't repeat mistakes and so the nuances get tracked. Emails have their own preferences. Social posts have their own references. Formal writing has its own. I can ask the skill what our defaults are for a given kind of email, and it has an inference layer — it reads my rough write-up, guesses what I'm actually trying to write, and produces a good-enough draft to push back on.</p>
+
+      <h2>Watching the voice profile</h2>
+
+      <p>The tool never edits Ali's profile. When the log accumulates 3 entries in a row that contradict a profile rule, the tool surfaces it in chat: <em>"Heads up — 3 entries in feedback_log now say you prefer X over Y, but the profile still says Y. Want to update?"</em></p>
+
+      <p>Then I screenshot it and send it to Ali. She decides.</p>
+
+      <p>This is the part that keeps the tool deferent to the source instead of the other way around. The profile is never wrong — it's just not finished. Ali wrote it over a weekend; a weekend doesn't catch every case. So the log isn't there to overrule the profile, it's there to find the rules the profile hasn't written down yet. Ali is the source. The robot is a mirror that, when it spots a pattern, asks her if she wants to add it.</p>
+
+      <h2>Drift</h2>
+
+      <p>People say LLMs drift, but a fresh model doesn't — it's the same weights every call. What actually drifts is the skill. I keep editing it, adding nuances, patching mistakes, and over enough edits a skill file accumulates cruft and contradicts itself. The expensive fix is to run two models against each other and do regression analysis on the confidence scores. The cheap fix is the one I built: the profile and the log are raw, append-only, untouched. They don't drift because nothing rewrites them. So when the skill starts producing drafts I don't like, I don't debug the skill — I regenerate it from scratch against the profile and the log. The skill is allowed to rot. The two files it's built from are not.</p>
+
+      <p>When a normal voice clone gets something wrong, you shrug and run it again. When <code>/alify</code> gets something wrong, I can open the files and find the cause — a rule, a missing correction, a gap in the skill. Most failures have an address. That's the difference between a voice clone you trust and one you don't: not how human it sounds, but whether you can find the bug.</p>
+
+      <p>So I built a robot to write like my boss. What I actually built was a list of every way I don't — written down, in order, where I can finally do something about it.</p>
+    </article>
