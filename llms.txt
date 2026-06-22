@@ -23,6 +23,7 @@ Christine Mae Tse is Chief of Staff at Outset Capital, where she spearheads fund
 
 ## Projects (operations & automation tooling)
 
+- **geoguessr-coach** (JavaScript): Chrome extension + local helper that reviews your GeoGuessr games after each match — silently captures what you looked at and uses Claude vision, grounded in PlonkIt country guides, to coach the region-level clues you missed.
 - **podcast-shorts-pipeline** (Python): Open-source pipeline that turns a podcast draft-shorts doc into captioned vertical shorts — auto-cuts segments, transcribes, and renders single-pane or stacked layouts with karaoke captions.
 - **attio-fathom-sync** (TypeScript): Syncs call recordings, transcripts, and notes into CRM, auto-tagging contacts and updating deal stages after every meeting.
 - **mixmax-extension** (JavaScript): Email-sending extension that surfaces at a LinkedIn profile to help draft outreach.
