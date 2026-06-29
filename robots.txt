@@ -1,4 +1,27 @@
+# OpenAI search/indexing crawler for ChatGPT search results.
+User-agent: OAI-SearchBot
+Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+# OpenAI crawler for improving generative AI foundation models.
+User-agent: GPTBot
+Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+# User-initiated ChatGPT browsing guidance.
+User-agent: ChatGPT-User
+Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+# Default policy for other search engines and answer-engine crawlers.
 User-agent: *
 Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+# AI crawlers should use https://maetse.com/llms.txt for a concise summary and https://maetse.com/llms-full.txt for detailed context.
 
 Sitemap: https://maetse.com/sitemap.xml

@@ -11,10 +11,15 @@
   {
     "@context": "https://schema.org",
     "@type": "Person",
+    "@id": "{{person.url}}/#person",
     "name": "{{person.name}}",
     "alternateName": "{{person.alternateName}}",
     "jobTitle": "{{person.jobTitle}}",
     "description": "{{seo.schemaDescription}}",
+    "email": "{{person.email}}",
+    "image": "{{person.image}}",
+    "url": "{{person.url}}",
+    "mainEntityOfPage": "{{person.url}}/",
     "gender": "{{person.gender}}",
     "homeLocation": {
       "@type": "Place",
@@ -26,11 +31,23 @@
       }
     },
     "knowsAbout": {{json.knowsAbout}},
+    "hasOccupation": {
+      "@type": "Occupation",
+      "name": "{{person.jobTitle}}",
+      "occupationLocation": {
+        "@type": "City",
+        "name": "{{location.cityState}}"
+      }
+    },
     "worksFor": {
       "@type": "Organization",
-      "name": "{{person.employer}}"
+      "name": "{{person.employer}}",
+      "url": "{{person.employerUrl}}"
     },
-    "url": "{{person.url}}",
+    "alumniOf": {
+      "@type": "CollegeOrUniversity",
+      "name": "{{education.alumniOf}}"
+    },
     "sameAs": {{json.sameAs}}
   }
   </script>
@@ -588,7 +605,7 @@
     </div>
     <p class="bio-name">Hi, I'm <span class="name-formal">{{person.formalName}}</span> {{person.firstName}} 👋</p>
     <p class="bio-text">
-      Currently Chief of Staff at Outset Capital, where I spearhead fund operations — managing deal flow, LP relations, and the many small things that keep a fund running. I've helped produce events like <a href="https://www.youtube.com/watch?v=jksGQhMtXjo&amp;list=PLhiu4AFpuCpqDwjWx-DvU6gpbAt9Mzbxw" target="_blank" rel="noopener">Thursday Nights in AI</a>, <a href="https://www.youtube.com/watch?v=FWqyqBlp8ng&amp;list=PLhiu4AFpuCprU4slou242mX98t_V8KxBc" target="_blank" rel="noopener">Portfolio Showcase</a>, and various investor dinners.
+      Currently Chief of Staff and AI operator at Outset Capital, where I spearhead fund operations — managing deal flow, LP relations, event production, CRM automation, and the many small things that keep a fund running. I've helped produce events like <a href="https://www.youtube.com/watch?v=jksGQhMtXjo&amp;list=PLhiu4AFpuCpqDwjWx-DvU6gpbAt9Mzbxw" target="_blank" rel="noopener">Thursday Nights in AI</a>, <a href="https://www.youtube.com/watch?v=FWqyqBlp8ng&amp;list=PLhiu4AFpuCprU4slou242mX98t_V8KxBc" target="_blank" rel="noopener">Portfolio Showcase</a>, and various investor dinners.
     </p>
     <p class="bio-text">
       Before Outset, I ran operations at a real estate firm, overseeing the full business cycle from sourcing to closing. Before that, I was an IQ/OQ/PQ validation consultant for biopharma companies in the South San Francisco area. Chemical engineer by training — graduated at 19.
@@ -613,6 +630,7 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
       </a>
       <a href="{{person.resumePath}}" class="bio-resume" target="_blank" rel="noopener">resume ↗</a>
+      <a href="./profile.html" class="bio-resume">profile ↗</a>
       <button type="button" class="bio-snake" id="snake-launcher" data-snake-open aria-label="Play snake">play snake ↗</button>
     </div>
   </section>
@@ -688,6 +706,7 @@
       <a href="{{links.linkedin}}" target="_blank" rel="noopener">linkedin</a>
       <a href="{{links.github}}" target="_blank" rel="noopener">github</a>
       <a href="{{links.x}}" target="_blank" rel="noopener">x</a>
+      <a href="./profile.html">profile</a>
       <a href="mailto:{{person.email}}">email</a>
     </div>
   </footer>

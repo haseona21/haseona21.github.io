@@ -5,6 +5,8 @@
  *   data/site.json        canonical facts (name, title, location, links, projects, writing)
  *   src/index.html        homepage template      -> index.html
  *   src/llms.txt          llms.txt template      -> llms.txt
+ *   src/llms-full.txt     deep LLM profile       -> llms-full.txt
+ *   src/profile.html      canonical profile      -> profile.html
  *   src/templates/post.html + src/writing/<slug>.html (article body) -> writing/<slug>.html
  *
  * Every cross-file fact lives in data/site.json. Edit the source, never the
@@ -32,6 +34,7 @@ const person = {
 // JSON-LD array literals, indented to match the surrounding block exactly.
 const jsonArray = (items) =>
   '[\n' + items.map((s) => '      ' + JSON.stringify(s)).join(',\n') + '\n    ]';
+const compactJson = (value) => JSON.stringify(value);
 
 const sameAs = [site.links.linkedin, site.links.github, site.links.x, site.links.instagram];
 
@@ -65,6 +68,20 @@ const indexWriting = site.writing
   )
   .join('\n');
 
+const profileProjects = site.projects
+  .map((p) => {
+    const name = p.url ? `<a href="${p.url}">${p.name}</a>` : p.name;
+    return `      <li><strong>${name}</strong> (${p.lang}) — ${p.desc}.</li>`;
+  })
+  .join('\n');
+
+const profileWriting = site.writing
+  .map(
+    (w) =>
+      `      <li><a href="./writing/${w.slug}.html">${w.title}</a> — ${w.llmsDescription} (${w.dateDisplay})</li>`
+  )
+  .join('\n');
+
 // llms.txt list sections.
 const llmsProjects = site.projects
   .map((p) => `- **${p.name}** (${p.lang}): ${p.desc}.`)
@@ -78,13 +95,14 @@ const llmsWriting = site.writing
 
 const ctx = {
   person,
+  education: site.education,
   location: site.location,
   links: site.links,
   accounts: site.accounts,
   seo: site.seo,
   content: site.content,
   json: { knowsAbout: jsonArray(site.knowsAbout), sameAs: jsonArray(sameAs) },
-  html: { indexProjects, indexWriting },
+  html: { indexProjects, indexWriting, profileProjects, profileWriting },
   md: { llmsProjects, llmsWriting },
 };
 
@@ -109,6 +127,8 @@ function render(label, tpl, context) {
 const outputs = {};
 outputs['index.html'] = render('index.html', read('src/index.html'), ctx);
 outputs['llms.txt'] = render('llms.txt', read('src/llms.txt'), ctx);
+outputs['llms-full.txt'] = render('llms-full.txt', read('src/llms-full.txt'), ctx);
+outputs['profile.html'] = render('profile.html', read('src/profile.html'), ctx);
 
 const postTpl = read('src/templates/post.html');
 for (const w of site.writing) {
@@ -117,6 +137,30 @@ for (const w of site.writing) {
     ...w,
     ogTitle: w.title,
     ogUrl: `${site.seo.ogBase}/writing/${w.slug}.html`,
+    canonicalUrl: `${person.url}/writing/${w.slug}.html`,
+    articleJsonLd: compactJson({
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: w.title,
+      description: w.metaDescription,
+      datePublished: w.published,
+      dateModified: w.updated || w.published,
+      mainEntityOfPage: `${person.url}/writing/${w.slug}.html`,
+      url: `${person.url}/writing/${w.slug}.html`,
+      author: {
+        '@type': 'Person',
+        '@id': `${person.url}/#person`,
+        name: person.name,
+        url: person.url,
+        sameAs,
+      },
+      publisher: {
+        '@type': 'Person',
+        '@id': `${person.url}/#person`,
+        name: person.name,
+        url: person.url,
+      },
+    }),
     bodyHtml,
   };
   outputs[`writing/${w.slug}.html`] = render(`writing/${w.slug}.html`, postTpl, { ...ctx, post });
@@ -124,8 +168,31 @@ for (const w of site.writing) {
 
 // ── robots.txt ───────────────────────────────────────────────────────────────
 outputs['robots.txt'] = [
+  '# OpenAI search/indexing crawler for ChatGPT search results.',
+  'User-agent: OAI-SearchBot',
+  'Allow: /',
+  'Allow: /llms.txt',
+  'Allow: /llms-full.txt',
+  '',
+  '# OpenAI crawler for improving generative AI foundation models.',
+  'User-agent: GPTBot',
+  'Allow: /',
+  'Allow: /llms.txt',
+  'Allow: /llms-full.txt',
+  '',
+  '# User-initiated ChatGPT browsing guidance.',
+  'User-agent: ChatGPT-User',
+  'Allow: /',
+  'Allow: /llms.txt',
+  'Allow: /llms-full.txt',
+  '',
+  '# Default policy for other search engines and answer-engine crawlers.',
   'User-agent: *',
   'Allow: /',
+  'Allow: /llms.txt',
+  'Allow: /llms-full.txt',
+  '',
+  `# AI crawlers should use ${person.url}/llms.txt for a concise summary and ${person.url}/llms-full.txt for detailed context.`,
   '',
   `Sitemap: ${person.url}/sitemap.xml`,
   '',
@@ -144,6 +211,9 @@ outputs['sitemap.xml'] =
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
     urlEntry(`${person.url}/`, latest),
+    urlEntry(`${person.url}/profile.html`, latest),
+    urlEntry(`${person.url}/llms.txt`, latest),
+    urlEntry(`${person.url}/llms-full.txt`, latest),
     ...site.writing.map((w) => urlEntry(`${person.url}/writing/${w.slug}.html`, w.published)),
     '</urlset>',
   ].join('\n') + '\n';

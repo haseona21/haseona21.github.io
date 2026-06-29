@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{person.name}} — Profile</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg"/>
+  <meta name="description" content="{{seo.profileDescription}}"/>
+  <link rel="canonical" href="{{person.url}}/profile.html"/>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "mainEntity": {
+      "@type": "Person",
+      "@id": "{{person.url}}/#person",
+      "name": "{{person.name}}",
+      "alternateName": "{{person.alternateName}}",
+      "jobTitle": "{{person.jobTitle}}",
+      "description": "{{seo.schemaDescription}}",
+      "email": "{{person.email}}",
+      "image": "{{person.image}}",
+      "url": "{{person.url}}",
+      "mainEntityOfPage": "{{person.url}}/profile.html",
+      "homeLocation": {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "{{location.locality}}",
+          "addressRegion": "{{location.region}}",
+          "addressCountry": "{{location.country}}"
+        }
+      },
+      "hasOccupation": {
+        "@type": "Occupation",
+        "name": "{{person.jobTitle}}",
+        "occupationLocation": {
+          "@type": "City",
+          "name": "{{location.cityState}}"
+        }
+      },
+      "worksFor": {
+        "@type": "Organization",
+        "name": "{{person.employer}}",
+        "url": "{{person.employerUrl}}"
+      },
+      "alumniOf": {
+        "@type": "CollegeOrUniversity",
+        "name": "{{education.alumniOf}}"
+      },
+      "knowsAbout": {{json.knowsAbout}},
+      "sameAs": {{json.sameAs}}
+    }
+  }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #F7F4F0;
+      --text: #1A1714;
+      --muted: #8C8378;
+      --accent: #C4836A;
+      --border: #DDD8D0;
+      --mono: 'Geist Mono', monospace;
+      --sans: 'Inter', sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-weight: 300;
+      line-height: 1.7;
+      font-size: 15px;
+    }
+    main { max-width: 760px; margin: 0 auto; padding: 5rem 2rem 6rem; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; }
+    .back, .label {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .back { display: inline-block; margin-bottom: 3rem; }
+    h1 { font-size: 2rem; font-weight: 500; line-height: 1.2; margin: 0 0 1rem; }
+    h2 { font-size: 1rem; font-weight: 500; margin: 2.5rem 0 1rem; }
+    p { margin: 0 0 1rem; }
+    ul { margin: 0; padding: 0; list-style: none; }
+    li { padding: 0.55rem 0; border-bottom: 1px solid var(--border); }
+    .summary { color: var(--muted); max-width: 620px; }
+    .facts { display: grid; grid-template-columns: 150px 1fr; gap: 0; margin-top: 2rem; border-top: 1px solid var(--border); }
+    .facts dt, .facts dd { margin: 0; padding: 0.65rem 0; border-bottom: 1px solid var(--border); }
+    .facts dt { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .facts dd { color: var(--text); }
+    @media (max-width: 640px) {
+      main { padding: 3rem 1.5rem 4rem; }
+      .facts { grid-template-columns: 1fr; }
+      .facts dt { border-bottom: none; padding-bottom: 0.15rem; }
+      .facts dd { padding-top: 0; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="./">← home</a>
+    <p class="label">Canonical Profile</p>
+    <h1>{{person.name}}</h1>
+    <p class="summary">{{seo.schemaDescription}}</p>
+
+    <dl class="facts">
+      <dt>Role</dt>
+      <dd>{{person.jobTitle}} at <a href="{{person.employerUrl}}">{{person.employer}}</a></dd>
+      <dt>Location</dt>
+      <dd>{{location.cityState}}, United States</dd>
+      <dt>Focus</dt>
+      <dd>Fund operations, venture operations, deal flow, LP relations, event production, CRM automation, and AI tooling.</dd>
+      <dt>Education</dt>
+      <dd>{{education.field}}, {{education.alumniOf}}</dd>
+      <dt>Contact</dt>
+      <dd><a href="mailto:{{person.email}}">{{person.email}}</a></dd>
+      <dt>Resume</dt>
+      <dd><a href="{{person.resumeFile}}">PDF resume</a></dd>
+    </dl>
+
+    <h2>Projects</h2>
+    <ul>
+{{html.profileProjects}}
+    </ul>
+
+    <h2>Writing</h2>
+    <ul>
+{{html.profileWriting}}
+    </ul>
+  </main>
+</body>
+</html>

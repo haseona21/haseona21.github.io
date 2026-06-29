@@ -7,9 +7,15 @@
     "jobTitle": "Chief of Staff",
     "gender": "Female",
     "employer": "Outset Capital",
+    "employerUrl": "https://outsetcapital.com",
     "email": "hello@maetse.com",
     "url": "https://maetse.com",
+    "image": "https://maetse.com/profile.png",
     "resumeFile": "Christine_Tse_Resume.pdf"
+  },
+  "education": {
+    "alumniOf": "University of the Philippines",
+    "field": "Chemical Engineering"
   },
   "location": {
     "locality": "Chicago",
@@ -28,12 +34,17 @@
   },
   "seo": {
     "googleSiteVerification": "QP4GVfhoE4wP3yOm3Y7c-WR0esgsqR8__qVlMY9DH7c",
-    "metaDescription": "Christine Mae Tse — Chief of Staff at Outset Capital, based in Chicago. An immigrant woman in tech and venture capital. Fund operations, event production, and deal flow.",
-    "schemaDescription": "Chief of Staff at Outset Capital and an immigrant woman in tech and venture capital, based in Chicago. Leads fund operations, deal flow, LP relations, event production, and CRM/workflow automation.",
+    "metaDescription": "Christine Mae Tse — Chief of Staff and AI operator at Outset Capital, based in Chicago. Fund operations, event production, deal flow, CRM automation, and AI tooling.",
+    "schemaDescription": "Chief of Staff and AI operator at Outset Capital, based in Chicago. Leads fund operations, deal flow, LP relations, event production, CRM/workflow automation, and AI tooling.",
+    "profileDescription": "Canonical profile for Christine Mae Tse, Chief of Staff and AI operator at Outset Capital in Chicago, focused on fund operations, venture operations, event production, deal flow, CRM automation, and AI tooling.",
     "ogBase": "https://haseona21.github.io"
   },
   "knowsAbout": [
     "Chief of Staff",
+    "Chief of Staff in Chicago",
+    "AI operator",
+    "AI operators in Chicago",
+    "AI operator examples",
     "Fund operations",
     "Venture capital operations",
     "Deal flow management",
