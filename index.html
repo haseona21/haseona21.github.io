@@ -331,6 +331,10 @@
     .project-name { font-size: 0.88rem; color: var(--text); font-weight: 300; }
     .project-name a { color: inherit; text-decoration: none; }
     .project-name a:hover { color: var(--accent); }
+    /* Snake opens in-page rather than linking out, so its name is a button —
+       styled to read exactly like the project links next to it. */
+    .project-name button { color: inherit; background: none; border: none; font: inherit; padding: 0; cursor: pointer; }
+    .project-name button:hover { color: var(--accent); }
     .project-desc { font-size: 0.78rem; color: var(--muted); }
     .project-lang { font-family: var(--mono); font-size: 0.65rem; color: var(--muted); white-space: nowrap; }
     .project-note { font-size: 0.78rem; color: var(--muted); margin-top: 1.25rem; font-style: italic; }
@@ -770,6 +774,25 @@
       <span class="project-lang">HTML</span>
     </div>
     <p class="project-note">Still learning — these are tools I built to solve real problems.</p>
+  </section>
+
+  <!-- GAMES -->
+  <section id="games">
+    <p class="section-label">Games I Created</p>
+    <div class="project-item">
+      <div class="project-info">
+        <span class="project-name"><button type="button" data-snake-open aria-label="Play snake">snake ↗</button></span>
+        <span class="project-desc">A pixel snake game you can play right here on the site — eat, grow, and don't bite your own tail.</span>
+      </div>
+      <span class="project-lang">JavaScript</span>
+    </div>
+    <div class="project-item">
+      <div class="project-info">
+        <span class="project-name"><a href="https://pour-app-production.up.railway.app" target="_blank" rel="noopener">pour ↗</a></span>
+        <span class="project-desc">An ad-free water-sort puzzle built for two — mystery levels, scratch-off rewards, and a fewest-moves leaderboard.</span>
+      </div>
+      <span class="project-lang">JavaScript</span>
+    </div>
   </section>
 
   <!-- TRAVEL + MAP -->
