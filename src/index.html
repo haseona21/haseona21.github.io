@@ -3,10 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{person.name}}</title>
+  <title>{{seo.homeTitle}}</title>
   <link rel="icon" type="image/svg+xml" href="./favicon.svg"/>
+  <link rel="canonical" href="{{person.url}}/"/>
   <meta name="google-site-verification" content="{{seo.googleSiteVerification}}"/>
   <meta name="description" content="{{seo.metaDescription}}"/>
+  <meta name="author" content="{{person.name}}"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:site_name" content="{{person.name}}"/>
+  <meta property="og:title" content="{{seo.homeTitle}}"/>
+  <meta property="og:description" content="{{seo.metaDescription}}"/>
+  <meta property="og:url" content="{{person.url}}/"/>
+  <meta property="og:image" content="{{seo.ogImage}}"/>
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="630"/>
+  <meta property="og:image:alt" content="{{seo.homeTitle}}"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="{{seo.homeTitle}}"/>
+  <meta name="twitter:description" content="{{seo.metaDescription}}"/>
+  <meta name="twitter:image" content="{{seo.ogImage}}"/>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
