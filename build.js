@@ -101,6 +101,7 @@ const ctx = {
   accounts: site.accounts,
   seo: site.seo,
   content: site.content,
+  map: site.map,
   json: { knowsAbout: jsonArray(site.knowsAbout), sameAs: jsonArray(sameAs) },
   html: { indexProjects, indexWriting, profileProjects, profileWriting },
   md: { llmsProjects, llmsWriting },

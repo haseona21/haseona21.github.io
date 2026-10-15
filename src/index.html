@@ -836,7 +836,7 @@
 
     const isDark = theme === 'dark';
     baseLayer = L.tileLayer(
-      `https://{s}.basemaps.cartocdn.com/${isDark ? 'dark_nolabels' : 'light_nolabels'}/{z}/{x}/{y}{r}.png`,
+      `https://{s}.basemaps.cartocdn.com/${isDark ? 'dark_nolabels' : 'light_nolabels'}/{z}/{x}/{y}{r}.png?key={{map.cartoKey}}`,
       {
         attribution: '© OpenStreetMap © CARTO',
         maxZoom: 19,
@@ -845,7 +845,7 @@
     ).addTo(map);
 
     labelsLayer = L.tileLayer(
-      `https://{s}.basemaps.cartocdn.com/${isDark ? 'dark_only_labels' : 'light_only_labels'}/{z}/{x}/{y}{r}.png`,
+      `https://{s}.basemaps.cartocdn.com/${isDark ? 'dark_only_labels' : 'light_only_labels'}/{z}/{x}/{y}{r}.png?key={{map.cartoKey}}`,
       {
         attribution: '© OpenStreetMap © CARTO',
         maxZoom: 19,

@@ -126,5 +126,8 @@
       "ogDescription": "Notes from building an event-driven daemon for a small VC fund's CRM ops.",
       "llmsDescription": "Notes from building an event-driven daemon for a small VC fund's CRM ops — workflows, actions, an AI triage layer, and the failure modes that shaped the design."
     }
-  ]
+  ],
+  "map": {
+    "cartoKey": "cb1_4l1q_1_68ce31e1731dd58deee4b9c1"
+  }
 }
